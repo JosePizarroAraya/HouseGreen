@@ -1,0 +1,160 @@
+.property-card {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #e5e5e4;
+  border-radius: 12px;
+  background-color: white;
+  overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+  transition: box-shadow 0.2s ease;
+}
+
+.property-card:hover {
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+}
+
+.property-card-image-wrapper {
+  position: relative;
+  height: 180px;
+  width: 100%;
+  background-color: #f0f0ef;
+}
+
+.property-card-image {
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+}
+
+/* Riesgo arriba a la izquierda y favorito arriba a la derecha (como en el prototipo) */
+.property-card-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+}
+
+.property-card-fav-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background-color: white;
+  font-size: 18px;
+  color: #a3a3a3;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.property-card-fav-btn.is-favorito {
+  color: #dc2626;
+}
+
+.property-card-fav-btn:hover {
+  transform: scale(1.08);
+}
+
+.property-card-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 16px;
+}
+
+/* Crece para llenar el espacio: así el pie queda abajo aunque las tarjetas tengan distinto alto */
+.property-card-info {
+  flex: 1;
+  min-width: 0;
+  padding-bottom: 14px;
+}
+
+.property-card-comuna {
+  margin: 0;
+  color: #737373;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.property-card-title {
+  margin: 4px 0 0;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.property-card-address {
+  margin: 2px 0 0;
+  font-size: 13px;
+  color: #737373;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.property-card-label {
+  margin: 12px 0 0;
+  font-size: 12px;
+  color: #737373;
+}
+
+.property-card-precios {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+}
+
+.property-card-price {
+  font-size: 20px;
+  font-weight: 700;
+  color: #15803d;
+}
+
+.property-card-m2 {
+  font-size: 13px;
+  color: #525252;
+}
+
+.property-card-details {
+  margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.property-card-details span {
+  padding: 4px 10px;
+  border-radius: 8px;
+  background-color: #f5f5f4;
+  font-size: 13px;
+  color: #404040;
+}
+
+/* Fecha del remate: el dato más importante de la tarjeta, por eso va en negrita */
+.property-card-details .property-card-remate {
+  font-weight: 700;
+  color: #14532d;
+}
+
+.property-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 12px;
+  border-top: 1px solid #f0f0ef;
+  font-size: 13px;
+  color: #737373;
+}
+
+.property-card-ver {
+  color: #15803d;
+  font-weight: 700;
+  white-space: nowrap;
+}

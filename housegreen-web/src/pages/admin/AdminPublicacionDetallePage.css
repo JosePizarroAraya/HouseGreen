@@ -1,0 +1,211 @@
+/* Detalle de una publicación del admin (paleta "Menta sereno") */
+.det-volver {
+  display: inline-block;
+  margin-bottom: 14px;
+  color: #1d6f55;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.det-volver:hover {
+  text-decoration: underline;
+}
+
+/* Foto grande con la zona encima */
+.det-foto-caja {
+  position: relative;
+}
+
+.det-foto {
+  display: block;
+  width: 100%;
+  height: 260px;
+  border-radius: 20px;
+  object-fit: cover;
+}
+
+.det-zona {
+  position: absolute;
+  left: 14px;
+  bottom: 14px;
+  box-shadow: 0 1px 4px rgba(15, 61, 48, 0.2);
+}
+
+.det-titulo {
+  margin-top: 16px;
+}
+
+/* Las dos cifras del resumen */
+.det-cifras {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.det-cifra {
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  background-color: white;
+  border: 1px solid #dce6e1;
+  border-radius: 16px;
+  color: #4e625b;
+}
+
+.det-cifra strong {
+  color: #0f3d30;
+  font-size: 30px;
+  line-height: 1.1;
+}
+
+.det-cifra-extra {
+  margin-top: 2px;
+  font-size: 14px;
+}
+
+/* Pestañas "La vieron" / "La guardaron" */
+.det-pestanas {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  margin-top: 18px;
+  padding: 4px;
+  border-radius: 14px;
+  background-color: #e4ece8;
+}
+
+.det-pestana {
+  padding: 10px;
+  border: none;
+  border-radius: 11px;
+  background-color: transparent;
+  color: #4e625b;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.det-pestana.is-activa {
+  background-color: white;
+  color: #0f3d30;
+  box-shadow: 0 1px 3px rgba(15, 61, 48, 0.15);
+}
+
+/* Lista de personas */
+.det-personas {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 4px 16px;
+  background-color: white;
+  border: 1px solid #dce6e1;
+  border-radius: 16px;
+}
+
+.det-persona {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+}
+
+.det-persona + .det-persona {
+  border-top: 1px solid #dce6e1;
+}
+
+.det-avatar {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background-color: #e4f3ec;
+  color: #0f3d30;
+  font-weight: 700;
+}
+
+.det-persona-datos {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  color: #4e625b;
+  font-size: 14px;
+}
+
+.det-persona-datos strong {
+  color: #0f3d30;
+  font-size: 16px;
+}
+
+.det-correo {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.det-etiqueta {
+  flex-shrink: 0;
+  margin-left: auto;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background-color: #e4f3ec;
+  color: #1d6f55;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.det-vacio {
+  padding: 16px 0;
+  color: #4e625b;
+  text-align: center;
+}
+
+@media (max-width: 640px) {
+  .det-foto {
+    height: 190px;
+  }
+
+  .det-cifra strong {
+    font-size: 26px;
+  }
+}
+/* Paso 21: fila de arriba con "‹ Publicaciones" y "✎ Editar" */
+.det-arriba {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.det-arriba .det-volver {
+  margin-bottom: 0;
+}
+
+.det-editar {
+  padding: 8px 14px;
+  border: 1px solid #dce6e1;
+  border-radius: 12px;
+  background-color: white;
+  color: #0f3d30;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.det-editar:hover {
+  border-color: #9ad3bb;
+}
+
+/* --- Paso 32: columnas parejas aunque las fotos sean grandes --- */
+/* minmax(0, 1fr) = cada columna mide lo mismo, sin importar el tamaño original de la foto */
+.edi-agregar {
+  align-self: start; /* el recuadro "Agregar" no se estira ni se sale de la tarjeta */
+}
+
+@media (max-width: 640px) {
+  .edi-fotos {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

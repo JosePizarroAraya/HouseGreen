@@ -1,0 +1,14 @@
+# Entorno virtual de Python (cada uno crea el suyo con requirements.txt)
+venv/
+
+# Archivos que genera Python solo
+__pycache__/
+*.pyc
+
+# Claves y contraseñas: NUNCA se suben
+.env
+
+# Fotos que sube el admin (son datos, no código)
+uploads/
+
+db/housegreen.sql

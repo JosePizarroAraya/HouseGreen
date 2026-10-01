@@ -1,0 +1,98 @@
+/* Colores del prototipo (paleta "Menta sereno") */
+.admin-layout {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 24px 16px 96px;
+}
+
+.admin-chip {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background-color: #0f3d30;
+  color: white;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* Computador: pestañas arriba */
+.admin-nav {
+  display: flex;
+  gap: 6px;
+  margin-top: 16px;
+  border-bottom: 1px solid #dce6e1;
+}
+
+.admin-nav-link {
+  padding: 10px 14px;
+  border-radius: 10px 10px 0 0;
+  color: #4e625b;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+  border-bottom: 3px solid transparent;
+}
+
+.admin-nav-link:hover {
+  background-color: #e4f3ec;
+}
+
+.admin-nav-link.is-activo {
+  color: #1d6f55;
+  border-bottom-color: #1d6f55;
+}
+
+.admin-contenido {
+  margin-top: 24px;
+}
+
+.admin-titulo {
+  margin: 0;
+  font-size: 28px;
+  color: #0f3d30;
+}
+
+.admin-subtitulo {
+  margin: 6px 0 0;
+  color: #4e625b;
+}
+
+.admin-en-construccion {
+  margin-top: 20px;
+  padding: 24px;
+  border: 1px dashed #9ad3bb;
+  border-radius: 14px;
+  background-color: white;
+  color: #4e625b;
+  text-align: center;
+}
+
+/* Celular: menú fijo abajo, como en el prototipo */
+@media (max-width: 640px) {
+  .admin-nav {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 10;
+    margin: 0;
+    justify-content: space-around;
+    background-color: white;
+    border-top: 1px solid #dce6e1;
+    border-bottom: none;
+    padding: 8px 4px calc(8px + env(safe-area-inset-bottom));
+  }
+
+  .admin-nav-link {
+    flex: 1;
+    text-align: center;
+    border-radius: 999px;
+    border-bottom: none;
+    padding: 10px 4px;
+    font-size: 13px;
+  }
+
+  .admin-nav-link.is-activo {
+    background-color: #e4f3ec;
+  }
+}

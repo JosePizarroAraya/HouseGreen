@@ -1,0 +1,28 @@
+# Dependencias de la API de HouseGreen (Python 3.11)
+# Instalar con:  pip install -r requirements.txt
+
+# Servidor y API
+fastapi==0.141.1
+uvicorn==0.52.4
+python-multipart==0.0.32
+
+# Base de datos
+sqlalchemy==2.0.52
+psycopg2-binary==2.9.12
+
+# Validación de datos
+pydantic==2.13.5
+email-validator==2.3.0
+
+# Configuración (.env)
+python-dotenv==1.2.3
+
+# Login: tokens JWT y contraseñas
+python-jose==3.5.0
+passlib==1.7.4
+bcrypt==4.0.1
+
+# Scraper
+requests==2.34.2
+beautifulsoup4==4.15.0
+lxml==6.1.3
