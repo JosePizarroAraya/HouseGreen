@@ -6,6 +6,7 @@ from pathlib import Path
 
 from app.database import get_db
 from app.auth.dependencies import requerir_admin
+from app.nube import subir_foto_a_la_nube, borrar_foto_de_la_nube, ErrorDeNube
 from app.models.property import Property, Comuna, PropertyEvaluation, PropertyView, PropertyPhoto
 from app.models.favorite import SavedProperty
 from app.models.user import User
@@ -226,17 +227,18 @@ def subir_foto(
     if len(contenido) > MAX_BYTES_FOTO:
         raise HTTPException(status_code=400, detail="La foto pesa más de 5 MB")
 
-    extension = _extension_de_imagen(contenido)
-    if extension is None:
+    if _extension_de_imagen(contenido) is None:
         raise HTTPException(status_code=400, detail="Solo se aceptan fotos JPG, PNG o WEBP")
 
-    # Nombre al azar: evita choques entre archivos con el mismo nombre y no expone el nombre original
-    nombre = f"{uuid4().hex}{extension}"
-    CARPETA_FOTOS.mkdir(parents=True, exist_ok=True)
-    (CARPETA_FOTOS / nombre).write_bytes(contenido)
+    # Paso 41: la foto se guarda en la nube (Cloudinary) con un nombre al azar,
+    # que evita choques entre archivos y no expone el nombre original
+    try:
+        url = subir_foto_a_la_nube(contenido, uuid4().hex)
+    except ErrorDeNube:
+        raise HTTPException(status_code=502, detail="No se pudo guardar la foto en la nube. Intenta de nuevo.")
 
     # Va al final de la lista; si es la primera foto (position 0), queda como portada
-    foto = PropertyPhoto(property_id=property_id, url=f"/uploads/propiedades/{nombre}", position=cantidad)
+    foto = PropertyPhoto(property_id=property_id, url=url, position=cantidad)
     db.add(foto)
     db.commit()
     db.refresh(foto)
@@ -255,10 +257,18 @@ def _fotos_ordenadas(db: Session, property_id: UUID) -> list[PropertyPhoto]:
 
 
 def _borrar_archivo(url: str):
-    # Solo borra archivos de nuestra carpeta. Path(url).name deja solo el nombre del archivo,
-    # así una url rara (con "../") no puede borrar nada fuera de uploads/propiedades.
     if url.startswith("/uploads/propiedades/"):
+        # Fotos antiguas, guardadas en la carpeta de la API. Path(url).name deja solo el nombre del archivo,
+        # así una url rara (con "../") no puede borrar nada fuera de uploads/propiedades.
         (CARPETA_FOTOS / Path(url).name).unlink(missing_ok=True)
+    else:
+        # Paso 42: fotos en la nube (Cloudinary)
+        try:
+            borrar_foto_de_la_nube(url)
+        except ErrorDeNube:
+            # La foto ya se quitó de la base, así que para la web ya no existe.
+            # Si la nube falla (por ejemplo, sin internet), solo queda un archivo suelto en Cloudinary.
+            pass
 
 
 @router.delete("/publicaciones/{property_id}/fotos/{foto_id}", response_model=list[FotoOut])

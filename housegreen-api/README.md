@@ -3,28 +3,21 @@
 Plataforma para evaluar propiedades en remate en Chile: catálogo con semáforo de riesgo,
 favoritos, alertas y panel de administración.
 
-- **housegreen-api**: API en FastAPI + SQLAlchemy + PostgreSQL
+- **housegreen-api**: API en FastAPI + SQLAlchemy
 - **housegreen-web**: web en React + Vite + TypeScript
+- **Base de datos**: PostgreSQL en la nube (Neon)
+- **Fotos**: en la nube (Cloudinary)
 
 ## Requisitos
 
-Instalar antes, en este orden:
+1. **Python 3.11**
+2. **Node.js 20.19 o más nuevo** (recomendado: 22 LTS)
+3. **Git**
 
-1. **PostgreSQL 18** (incluye pgAdmin)
-2. **Python 3.11**
-3. **Node.js 20.19 o más nuevo** (recomendado: 22 LTS)
-4. **Git**
+No hace falta instalar PostgreSQL: la base de datos y las fotos están en la nube,
+así que el proyecto funciona igual en cualquier computador.
 
-## 1. Base de datos
-
-1. En pgAdmin, crear una base vacía llamada `HouseGreenDB`.
-2. Clic sobre `HouseGreenDB` → **Query Tool** → ícono de carpeta (Open File) →
-   elegir `housegreen-api/db/housegreen.sql` → **Execute** (F5).
-3. Comprobar con `SELECT count(*) FROM properties;` (debe dar 7).
-
-> Si el script no está en el repositorio, pedirlo al equipo.
-> Las fotos subidas por el admin no van en el script: copiar la carpeta `housegreen-api/uploads/`.
-## 2. API (housegreen-api)
+## 1. API (housegreen-api)
 
 ```bash
 cd housegreen-api
@@ -33,12 +26,8 @@ venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-Copiar `.env.example` como `.env` y completar la clave de PostgreSQL:
-
-```
-DATABASE_URL=postgresql://postgres:TU_CLAVE@localhost:5432/HouseGreenDB
-SECRET_KEY=una-clave-larga-y-secreta
-```
+Copiar `.env.example` como `.env` y completar los 5 valores
+(la conexión de Neon y las claves de Cloudinary se piden al equipo; **no se suben al repositorio**).
 
 Levantar la API:
 
@@ -48,11 +37,7 @@ uvicorn app.main:app --reload
 
 Comprobar en http://localhost:8000/docs
 
-Las fotos que sube el administrador se guardan en `housegreen-api/uploads/`
-(la carpeta se crea sola). Si se usa un respaldo de la base que tiene fotos,
-copiar también esa carpeta.
-
-## 3. Web (housegreen-web)
+## 2. Web (housegreen-web)
 
 En otra terminal:
 
@@ -66,11 +51,13 @@ Abrir **http://localhost:5173** (usar `localhost`, no `127.0.0.1`, porque la API
 
 ## Uso diario
 
-Con todo instalado, cada vez se levanta en este orden:
+1. API: `venv\Scripts\activate` y `uvicorn app.main:app --reload`
+2. Web: `npm run dev`
 
-1. PostgreSQL (normalmente ya está corriendo como servicio)
-2. API: `venv\Scripts\activate` y `uvicorn app.main:app --reload`
-3. Web: `npm run dev`
+## Base de datos
+
+- Las consultas SQL se corren en la consola de Neon → **SQL Editor**.
+- Neon muestra las horas en UTC (3 horas más que en Chile); la web las muestra en hora local.
 
 ## Cuentas de prueba
 
@@ -94,7 +81,9 @@ python -m app.scraper.remates_scraper
 
 ## Problemas comunes
 
-- **La web dice que no puede conectar:** la API no está corriendo, o PostgreSQL está detenido.
+- **La web dice que no puede conectar:** la API no está corriendo, o falta el archivo `.env`.
+- **La primera carga demora unos segundos:** Neon apaga la base cuando no se usa y la enciende sola con la primera consulta.
 - **Error de CORS en la consola:** abrir la web en `http://localhost:5173`, no en `127.0.0.1`.
-- **La API no arranca y menciona `python-multipart`:** faltan dependencias; correr `pip install -r requirements.txt` con el venv activado.
+- **`uvicorn` no se reconoce como comando:** el venv no está activado o le faltan dependencias; correr `venv\Scripts\activate` y `pip install -r requirements.txt`.
+- **Error al subir fotos ("No se pudo guardar la foto en la nube"):** revisar las 3 claves de Cloudinary en el `.env` y la conexión a internet.
 - **Pantalla en blanco al volver a la pestaña (Opera GX):** apretar F5, o usar Chrome o Edge.

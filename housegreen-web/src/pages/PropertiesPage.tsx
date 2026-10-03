@@ -5,11 +5,11 @@ import { useFavorites } from "../context/FavoritesContext";
 import "./PropertiesPage.css";
 
 type Riesgo = "verde" | "amarillo" | "rojo";
-type Orden = "recientes" | "precio_asc" | "precio_desc" | "alfabetico" | "superficie";
+type Orden = "recientes" | "remate" | "precio_asc" | "precio_desc" | "alfabetico" | "superficie";
 
-// "Fecha de remate" se agrega cuando la base guarde esa fecha (llega con el scraper)
 const OPCIONES_ORDEN: { valor: Orden; texto: string }[] = [
   { valor: "recientes", texto: "Más recientes" },
+  { valor: "remate", texto: "Fecha de remate, más próximo primero" },
   { valor: "precio_asc", texto: "Precio: de menor a mayor" },
   { valor: "precio_desc", texto: "Precio: de mayor a menor" },
   { valor: "alfabetico", texto: "Alfabético (A–Z)" },
@@ -113,7 +113,12 @@ export function PropertiesPage() {
 
     // filter() ya creó una lista nueva, así que sort() no desordena los datos originales
     const superficie = (p: (typeof properties)[number]) => Number(p.physical_info?.surface_m2 ?? -1); // sin dato: al final
+    // Paso 38: fecha del remate en milisegundos; sin fecha vale Infinity para que quede al final
+    const fechaRemate = (p: (typeof properties)[number]) =>
+      p.auction_date ? new Date(p.auction_date).getTime() : Infinity;
     return resultado.sort((a, b) => {
+      if (orden === "remate" && fechaRemate(a) !== fechaRemate(b)) return fechaRemate(a) < fechaRemate(b) ? -1 : 1;
+      // (si tienen la misma fecha, o ninguna tiene, se ordenan por más recientes, abajo)
       if (orden === "precio_asc") return Number(a.opening_price) - Number(b.opening_price);
       if (orden === "precio_desc") return Number(b.opening_price) - Number(a.opening_price);
       if (orden === "alfabetico") return a.title.localeCompare(b.title, "es");

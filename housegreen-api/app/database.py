@@ -8,8 +8,9 @@ load_dotenv()
 
 DATABASE_URL = os.getenv("DATABASE_URL_NEON")
 
-# El "engine" es la conexión de bajo nivel hacia PostgreSQL
-engine = create_engine(DATABASE_URL)
+# pool_pre_ping: antes de usar una conexión guardada, comprueba que siga viva.
+# Hace falta con Neon, que se "duerme" tras unos minutos sin uso y corta las conexiones.
+engine = create_engine(DATABASE_URL, pool_pre_ping=True)
 
 # SessionLocal genera "sesiones" de trabajo con la base de datos.
 # Cada petición a la API va a abrir su propia sesión, hacer sus consultas, y cerrarla.
