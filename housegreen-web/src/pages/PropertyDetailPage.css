@@ -1,7 +1,7 @@
 .detail-page {
   max-width: 720px;
   margin: 0 auto;
-  padding: 32px 16px;
+  padding: 24px 16px 48px;
 }
 
 .detail-not-found {
@@ -9,16 +9,48 @@
   color: #737373;
 }
 
+/* Arriba: volver a la izquierda y guardar a la derecha */
+.detail-arriba {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
 .detail-back-link {
   color: #15803d;
   text-decoration: none;
   font-size: 14px;
+  font-weight: 600;
 }
 
 .detail-back-link:hover {
   text-decoration: underline;
 }
 
+.detail-guardar {
+  padding: 8px 14px;
+  border: 1px solid #d4d4d4;
+  border-radius: 999px;
+  background-color: white;
+  color: #404040;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.detail-guardar:hover {
+  border-color: #a3a3a3;
+}
+
+.detail-guardar.is-guardada {
+  border-color: #fca5a5;
+  background-color: #fef2f2;
+  color: #b91c1c;
+}
+
+/* La usa la galería de fotos */
 .detail-image {
   width: 100%;
   height: 320px;
@@ -27,53 +59,13 @@
   margin-top: 16px;
 }
 
+/* Comuna a la izquierda y semáforo a la derecha */
 .detail-header {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  margin-top: 20px;
-}
-
-.detail-header h1 {
-  margin: 0;
-  font-size: 24px;
-}
-
-.detail-address {
-  margin: 4px 0 0;
-  color: #737373;
-}
-
-.detail-price {
-  margin-top: 12px;
-  font-size: 26px;
-  font-weight: 700;
-  color: #15803d;
-}
-
-.detail-facts {
-  display: flex;
-  gap: 20px;
-  padding: 16px 0;
-  margin-top: 16px;
-  border-top: 1px solid #e5e5e4;
-  border-bottom: 1px solid #e5e5e4;
-  color: #404040;
-}
-
-.detail-tipo {
-  text-transform: capitalize;
-}
-
-.detail-description {
-  margin-top: 20px;
-  color: #404040;
-  line-height: 1.6;
-}
-
-/* --- Paso 31: celular --- */
-.detail-header {
+  align-items: center;
   gap: 12px;
+  margin-top: 20px;
 }
 
 .detail-header .risk-badge {
@@ -81,11 +73,120 @@
   white-space: nowrap;
 }
 
-.detail-facts {
-  flex-wrap: wrap; /* si no caben en una línea, pasan a la siguiente */
-  row-gap: 8px;
+.detail-comuna {
+  margin: 0;
+  color: #737373;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
-.detail-facts span {
-  white-space: nowrap; /* "2 dormitorios" no se parte en dos */
+.detail-titulo {
+  margin: 6px 0 0;
+  font-size: 26px;
+  line-height: 1.2;
+}
+
+.detail-address {
+  margin: 6px 0 0;
+  color: #737373;
+}
+
+/* Tarjeta del precio */
+.detail-precio {
+  margin-top: 20px;
+  padding: 16px 18px;
+  border: 1px solid #e5e5e4;
+  border-radius: 12px;
+  background-color: white;
+}
+
+.detail-precio-etiqueta {
+  margin: 0;
+  color: #737373;
+  font-size: 14px;
+}
+
+.detail-precio-valor {
+  margin: 2px 0 0;
+  font-size: 30px;
+  font-weight: 700;
+  color: #15803d;
+}
+
+.detail-precio-m2 {
+  margin: 2px 0 0;
+  color: #525252;
+  font-size: 14px;
+}
+
+/* Datos de la propiedad: casillas que se acomodan solas (2 por fila en celular, 3 o 4 en PC).
+   El fondo gris del contenedor y el espacio de 1px entre casillas dibujan las líneas divisorias. */
+.detail-datos {
+  margin-top: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1px;
+  border: 1px solid #e5e5e4;
+  border-radius: 12px;
+  background-color: #e5e5e4;
+  overflow: hidden;
+}
+
+.detail-dato {
+  flex: 1 1 160px;
+  padding: 14px 16px;
+  background-color: white;
+}
+
+.detail-dato-etiqueta {
+  margin: 0;
+  color: #737373;
+  font-size: 13px;
+}
+
+.detail-dato-valor {
+  margin: 4px 0 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: #171717;
+}
+
+.detail-dato-aviso {
+  display: inline-block;
+  margin-top: 8px;
+  padding: 3px 10px;
+  border-radius: 8px;
+  background-color: #dcfce7;
+  color: #166534;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+/* Secciones con título (descripción y las que vienen) */
+.detail-seccion {
+  margin-top: 28px;
+}
+
+.detail-seccion h2 {
+  margin: 0 0 8px;
+  font-size: 18px;
+}
+
+.detail-description {
+  margin: 0;
+  color: #404040;
+  line-height: 1.6;
+  white-space: pre-line; /* respeta los saltos de línea que escribió el admin */
+}
+
+@media (max-width: 640px) {
+  .detail-titulo {
+    font-size: 22px;
+  }
+
+  .detail-precio-valor {
+    font-size: 26px;
+  }
 }

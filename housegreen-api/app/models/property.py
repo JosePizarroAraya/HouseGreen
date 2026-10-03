@@ -37,7 +37,7 @@ class Property(Base):
     title = Column(String(200), nullable=False)
     address = Column(String(255))
     property_type = Column(String(50), nullable=False)
-    auction_type = Column(ENUM("judicial", "contribuciones", "banco", name="auction_type"), nullable=False)
+    auction_type = Column(ENUM("judicial", "contribuciones", "banco", "extrajudicial", name="auction_type"), nullable=False)
     opening_price = Column(Numeric(14, 2), nullable=False)
     auction_date = Column(TIMESTAMP(timezone=True))  # Paso 36: fecha y hora del remate (puede venir vacía)
     status = Column(

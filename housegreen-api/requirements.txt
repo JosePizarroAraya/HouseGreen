@@ -29,3 +29,6 @@ lxml==6.1.3
 
 # Fotos en la nube
 cloudinary==1.46.2
+
+# Zonas horarias (Windows no las trae)
+tzdata==2026.5

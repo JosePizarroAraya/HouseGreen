@@ -2,16 +2,20 @@ import requests
 from bs4 import BeautifulSoup
 import time
 import re
+from datetime import date, datetime
 
 BASE_URL = "https://www.rematesinmobiliarios.cl"
+# Listado de remates de la Región Metropolitana
+URL_RM = f"{BASE_URL}/remates/region-metropolitana/"
 HEADERS = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
 PAUSA_ENTRE_PETICIONES = 1.5
 
 
 def obtener_html(url: str) -> str:
     respuesta = requests.get(url, headers=HEADERS, timeout=15)
-    respuesta.raise_for_status()
+    # La pausa va siempre (también si la página no existe), para no recargar al sitio
     time.sleep(PAUSA_ENTRE_PETICIONES)
+    respuesta.raise_for_status()
     return respuesta.text
 
 
@@ -28,6 +32,15 @@ def limpiar_m2(texto: str) -> float | None:
     return limpiar_precio(texto)
 
 
+def convertir_fecha(texto: str) -> date | None:
+    # Paso 44: convierte "13-10-2026" (día-mes-año, como viene en el listado) en una fecha de verdad.
+    # Si la celda viene vacía o con otro formato, devuelve None en vez de fallar.
+    try:
+        return datetime.strptime(texto.strip(), "%d-%m-%Y").date()
+    except ValueError:
+        return None
+
+
 def extraer_remate_de_fila(fila) -> dict | None:
     remate_id = fila.get("title")
     celdas = fila.find_all("td")
@@ -39,8 +52,8 @@ def extraer_remate_de_fila(fila) -> dict | None:
     tipo_remate_img = celdas[1].find("img")
     tipo_remate = tipo_remate_img.get("title") if tipo_remate_img else None
 
-    fecha_remate = celdas[2].get_text(strip=True)
-    fecha_publicado = celdas[3].get_text(strip=True)
+    fecha_remate = convertir_fecha(celdas[2].get_text(strip=True))
+    fecha_publicado = convertir_fecha(celdas[3].get_text(strip=True))
     region = celdas[4].get_text(strip=True)
     comuna = celdas[5].get_text(strip=True)
     tipo_propiedad = celdas[6].get_text(strip=True)
@@ -83,10 +96,20 @@ def extraer_pagina(url: str) -> list[dict]:
             remates.append(remate)
     return remates
 
+def extraer_comuna(nombre_en_direccion: str) -> list[dict]:
+    # Paso 50: lee el listado público de una comuna, por ejemplo /remates/estacion-central/
+    # Si el sitio no tiene página para esa comuna (porque no tiene remates), devuelve una lista vacía.
+    try:
+        return extraer_pagina(f"{BASE_URL}/remates/{nombre_en_direccion}/")
+    except requests.HTTPError as error:
+        if error.response is not None and error.response.status_code == 404:
+            return []
+        raise
 
 if __name__ == "__main__":
-    remates = extraer_pagina(f"{BASE_URL}/")
+    remates = extraer_pagina(URL_RM)
     print(f"Se extrajeron {len(remates)} remates de la primera página.\n")
-    for r in remates[:3]:
-        print(r)
-        print()
+    for r in remates[:5]:
+        print(r["remate_id"], "|", r["fecha_remate"], "|", r["comuna"], "|", r["tipo_propiedad"], "|", r["precio_minimo"])
+    sin_fecha = [r["remate_id"] for r in remates if r["fecha_remate"] is None]
+    print(f"\nRemates sin fecha reconocida: {len(sin_fecha)} {sin_fecha}")

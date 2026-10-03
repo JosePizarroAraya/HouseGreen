@@ -216,3 +216,33 @@
   background-color: #15803d;
   color: white;
 }
+
+/* Paso 49: "Mostrando 24 de 529 remates" y el botón para ver más */
+.cat-mas {
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  color: #525252;
+  font-size: 14px;
+}
+
+.cat-mas p {
+  margin: 0;
+}
+
+.cat-boton-mas {
+  padding: 10px 28px;
+  border: 1px solid #15803d;
+  border-radius: 8px;
+  background-color: white;
+  color: #15803d;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.cat-boton-mas:hover {
+  background-color: #dcfce7;
+}

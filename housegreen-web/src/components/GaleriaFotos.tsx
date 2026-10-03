@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { api, urlDeArchivo } from "../api/client";
+import { SinFoto } from "./SinFoto";
 import "./GaleriaFotos.css";
 
 // Una foto subida por el admin (GET /propiedades/{id}/fotos, paso 28)
@@ -14,12 +15,11 @@ interface GaleriaFotosProps {
   propertyId: string;
   imagenRespaldo: string | null; // la imagen de la propiedad, por si no tiene fotos subidas
   titulo: string;
+  tipo: string; // tipo de propiedad: elige el dibujo cuando no hay ninguna foto (paso 52)
 }
 
-const SIN_IMAGEN = "https://placehold.co/900x500?text=Sin+imagen";
-
 // Foto grande con flechas y miniaturas para cambiarla (paso 29)
-export function GaleriaFotos({ propertyId, imagenRespaldo, titulo }: GaleriaFotosProps) {
+export function GaleriaFotos({ propertyId, imagenRespaldo, titulo, tipo }: GaleriaFotosProps) {
   const [fotos, setFotos] = useState<Foto[]>([]);
   const [actual, setActual] = useState(0); // posición de la foto que se ve en grande
 
@@ -30,15 +30,12 @@ export function GaleriaFotos({ propertyId, imagenRespaldo, titulo }: GaleriaFoto
       .catch(() => setFotos([])); // si falla, se muestra la imagen de respaldo
   }, [propertyId]);
 
-  // Sin fotos subidas: una sola imagen, como antes
+  // Sin fotos subidas: la imagen de la propiedad o, si tampoco tiene, el dibujo según su tipo
   if (fotos.length === 0) {
-    return (
-      <img
-        src={imagenRespaldo ? urlDeArchivo(imagenRespaldo) : SIN_IMAGEN}
-        alt={titulo}
-        className="detail-image"
-      />
-    );
+    if (!imagenRespaldo) {
+      return <SinFoto tipo={tipo} className="detail-image sin-foto-detalle" />;
+    }
+    return <img src={urlDeArchivo(imagenRespaldo)} alt={titulo} className="detail-image" />;
   }
 
   const foto = fotos[actual];

@@ -127,6 +127,7 @@ class PropertyCreate(BaseModel):
     property_type: str
     auction_type: str
     opening_price: Decimal
+    auction_date: datetime | None = None  # Paso 45: fecha del remate (la envía el scraper)
     image_url: str | None = None
     description: str | None = None
 

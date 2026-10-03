@@ -24,6 +24,9 @@ const RANGOS_PRECIO: { texto: string; desde: number | null; hasta: number | null
   { texto: "Más de $150M", desde: 150_000_000, hasta: null },
 ];
 
+// Paso 49: el catálogo muestra los remates de a 24 (con 1, 2, 3 o 4 columnas, las filas quedan completas)
+const POR_TANDA = 24;
+
 const NOMBRE_RIESGO: Record<Riesgo, string> = { verde: "Bajo", amarillo: "Medio", rojo: "Alto" };
 
 // "Irarrázaval" -> "irarrazaval", "Ñuñoa" -> "nunoa": sin mayúsculas ni tildes,
@@ -139,6 +142,23 @@ export function PropertiesPage() {
     orden,
   ]);
 
+  // Paso 49: cuántas tarjetas se muestran. La "firma" resume la búsqueda, los filtros y el orden:
+  // si cambia cualquiera de ellos, la firma guardada ya no coincide y se vuelve a las primeras 24.
+  const firma = JSON.stringify([
+    busqueda,
+    soloFavoritos,
+    orden,
+    precioDesde,
+    precioHasta,
+    comunasElegidas,
+    tiposElegidos,
+    riesgosElegidos,
+  ]);
+  
+  const [tanda, setTanda] = useState({ firma, cantidad: POR_TANDA });
+  const cantidadVisible = tanda.firma === firma ? tanda.cantidad : POR_TANDA;
+  const propiedadesVisibles = propiedadesFiltradas.slice(0, cantidadVisible);
+  const faltan = propiedadesFiltradas.length - propiedadesVisibles.length;
   const filtrosActivos =
     comunasElegidas.length +
     tiposElegidos.length +
@@ -330,11 +350,28 @@ export function PropertiesPage() {
         </div>
       )}
 
-      <div className="properties-grid">
-        {propiedadesFiltradas.map((property) => (
+            <div className="properties-grid">
+        {propiedadesVisibles.map((property) => (
           <PropertyCard key={property.id} property={property} />
         ))}
       </div>
+
+      {propiedadesFiltradas.length > POR_TANDA && (
+        <div className="cat-mas">
+          <p>
+            Mostrando {propiedadesVisibles.length} de {propiedadesFiltradas.length} remates
+          </p>
+          {faltan > 0 && (
+            <button
+              type="button"
+              className="cat-boton-mas"
+              onClick={() => setTanda({ firma, cantidad: cantidadVisible + POR_TANDA })}
+            >
+              Mostrar {Math.min(faltan, POR_TANDA)} más
+            </button>
+          )}
+        </div>
+      )}
 
       {propiedadesFiltradas.length === 0 && (
         <p className="properties-empty">No se encontraron propiedades con esos filtros.</p>

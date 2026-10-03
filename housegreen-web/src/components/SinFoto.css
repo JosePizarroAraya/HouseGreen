@@ -1,0 +1,67 @@
+/* Paso 52: dibujo que reemplaza a la foto cuando la propiedad no tiene */
+.sin-foto {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sin-foto svg {
+  width: 64px;
+  height: 64px;
+  fill: none;
+  stroke: currentColor; /* el dibujo toma el color de texto de cada categoría */
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Un color suave por categoría (paso 52b) */
+.sin-foto-departamento {
+  background-color: #e4f3ec;
+  color: #3f8f72;
+}
+
+.sin-foto-casa {
+  background-color: #f6eadc;
+  color: #a8733a;
+}
+
+.sin-foto-terreno {
+  background-color: #f3efd4;
+  color: #948a3a;
+}
+
+.sin-foto-parcela {
+  background-color: #e3f1d8;
+  color: #4f8a3c;
+}
+
+.sin-foto-comercial {
+  background-color: #e3eef7;
+  color: #3f7aa8;
+}
+
+.sin-foto-bodega {
+  background-color: #ebe8f4;
+  color: #6d62a3;
+}
+
+.sin-foto-derechos {
+  background-color: #f8e9e4;
+  color: #b2604a;
+}
+
+.sin-foto-otro {
+  background-color: #eceeed;
+  color: #7b8480;
+}
+
+/* En el detalle, sin fotos no hace falta una caja tan alta como la de la galería */
+.sin-foto.sin-foto-detalle {
+  height: 200px;
+}
+
+.sin-foto.sin-foto-detalle svg {
+  width: 80px;
+  height: 80px;
+}

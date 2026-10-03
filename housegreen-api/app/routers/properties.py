@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, selectinload
 from sqlalchemy import text
 from datetime import datetime, timedelta, timezone
 from uuid import UUID
@@ -111,8 +111,43 @@ def _guardar_datos_relacionados(db: Session, property_id: UUID, datos: PropertyC
 
 @router.get("", response_model=list[PropertyOut])
 def listar_propiedades(db: Session = Depends(get_db), usuario=Depends(get_current_user)):
-    propiedades = db.query(Property).all()
-    return [_armar_respuesta(db, p) for p in propiedades]
+    # Paso 47: antes se hacían unas 9 consultas por cada propiedad (con 500 remates, miles de consultas).
+    # Ahora son unas 10 consultas en total, sin importar cuántas propiedades haya.
+
+    # selectinload trae los datos relacionados de TODAS las propiedades en una consulta por tabla
+    propiedades = (
+        db.query(Property)
+        .options(
+            selectinload(Property.financial_info),
+            selectinload(Property.legal_info),
+            selectinload(Property.physical_info),
+            selectinload(Property.occupancy_info),
+            selectinload(Property.market_dynamics),
+            selectinload(Property.market_comparables),
+            selectinload(Property.debts),
+        )
+        .all()
+    )
+
+    # Última evaluación de cada propiedad: vienen de la más antigua a la más nueva,
+    # así en el diccionario queda guardada la última
+    evaluaciones = {}
+    for evaluacion in db.query(PropertyEvaluation).order_by(PropertyEvaluation.evaluated_at):
+        evaluaciones[evaluacion.property_id] = evaluacion
+
+    # Portada de cada propiedad: la primera foto según su posición
+    portadas = {}
+    for property_id, url in db.query(PropertyPhoto.property_id, PropertyPhoto.url).order_by(PropertyPhoto.position):
+        portadas.setdefault(property_id, url)
+
+    respuesta = []
+    for propiedad in propiedades:
+        salida = PropertyOut.model_validate(propiedad)
+        salida.evaluation = evaluaciones.get(propiedad.id)
+        if propiedad.id in portadas:
+            salida.image_url = portadas[propiedad.id]
+        respuesta.append(salida)
+    return respuesta
 
 @router.get("/{property_id}", response_model=PropertyOut)
 def obtener_propiedad(property_id: UUID, db: Session = Depends(get_db), usuario=Depends(get_current_user)):
@@ -144,6 +179,7 @@ def crear_propiedad(datos: PropertyCreate, db: Session = Depends(get_db), usuari
         property_type=datos.property_type,
         auction_type=datos.auction_type,
         opening_price=datos.opening_price,
+        auction_date=datos.auction_date,
         image_url=datos.image_url,
         description=datos.description,
         source_system=datos.source_system,

@@ -1,8 +1,10 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { RiskBadge } from "./RiskBadge";
 import { useFavorites } from "../context/FavoritesContext";
 import { useProperties } from "../context/PropertiesContext";
 import { urlDeArchivo } from "../api/client";
+import { SinFoto } from "./SinFoto";
 import "./PropertyCard.css";
 
 interface PropertyCardProps {
@@ -11,6 +13,7 @@ interface PropertyCardProps {
     title: string;
     address: string | null;
     comuna_id: number;
+    property_type: string;
     opening_price: string;
     auction_date: string | null;
     image_url: string | null;
@@ -43,6 +46,9 @@ function textoRemate(iso: string) {
   const fecha = new Date(iso);
   const dia = fecha.toLocaleDateString("es-CL", { weekday: "short" });
   const diaMes = fecha.toLocaleDateString("es-CL", { day: "numeric", month: "short" });
+  // Paso 48: las 00:00 significan "hora no informada" (así guarda el scraper los remates
+  // cuando el sitio solo trae el día), por eso en ese caso se muestra solo la fecha
+  if (fecha.getHours() === 0 && fecha.getMinutes() === 0) return `Remate ${dia} ${diaMes}`;
   const hora = fecha.toLocaleTimeString("es-CL", { hour: "2-digit", minute: "2-digit", hour12: false });
   return `Remate ${dia} ${diaMes} · ${hora}`;
 }
@@ -51,6 +57,11 @@ export function PropertyCard({ property }: PropertyCardProps) {
   const { esFavorito, alternarFavorito } = useFavorites();
   const { comunasPorId } = useProperties();
   const favorito = esFavorito(property.id);
+
+  // Paso 52: si la foto no carga (dirección rota), se recuerda cuál falló y se muestra el dibujo.
+  // Se guarda la dirección y no un simple "sí/no": así, si después la propiedad tiene otra foto, se vuelve a intentar.
+  const [fotoFallida, setFotoFallida] = useState<string | null>(null);
+  const tieneFoto = property.image_url !== null && property.image_url !== fotoFallida;
 
   function handleFavoritoClick(e: React.MouseEvent) {
     e.preventDefault();
@@ -78,11 +89,16 @@ export function PropertyCard({ property }: PropertyCardProps) {
   return (
     <Link to={`/propiedades/${property.id}`} className="property-card">
       <div className="property-card-image-wrapper">
-        <img
-          src={property.image_url ? urlDeArchivo(property.image_url) : "https://placehold.co/600x400?text=Sin+imagen"}
-          alt={property.title}
-          className="property-card-image"
-        />
+        {tieneFoto && property.image_url ? (
+          <img
+            src={urlDeArchivo(property.image_url)}
+            alt={property.title}
+            className="property-card-image"
+            onError={() => setFotoFallida(property.image_url)}
+          />
+        ) : (
+          <SinFoto tipo={property.property_type} className="property-card-image" />
+        )}
         <div className="property-card-badge">
           <RiskBadge riesgo={riesgo} />
         </div>
