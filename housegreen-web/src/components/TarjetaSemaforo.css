@@ -1,0 +1,160 @@
+/* Paso 53: tarjeta del semáforo en el detalle de la propiedad */
+.semaforo {
+  margin-top: 16px;
+  padding: 18px;
+  border: 1px solid #e5e5e4;
+  border-radius: 12px;
+  background-color: white;
+  /* Color del nivel: lo usan el título, los puntos y la barra. Por defecto, gris (sin puntaje) */
+  --color-nivel: #737373;
+}
+
+.semaforo-verde {
+  --color-nivel: #15803d;
+}
+
+.semaforo-amarillo {
+  --color-nivel: #a16207;
+}
+
+.semaforo-rojo {
+  --color-nivel: #b91c1c;
+}
+
+.semaforo-arriba {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.semaforo-texto {
+  flex: 1;
+  min-width: 0;
+}
+
+/* El semáforo: tres luces apagadas y una encendida */
+.semaforo-luces {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 7px;
+  border-radius: 14px;
+  background-color: #1f2937;
+  flex-shrink: 0;
+}
+
+.semaforo-luces span {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background-color: #4b5563;
+}
+
+.semaforo-luces span:nth-child(1).is-encendida {
+  background-color: #ef4444;
+}
+
+.semaforo-luces span:nth-child(2).is-encendida {
+  background-color: #facc15;
+}
+
+.semaforo-luces span:nth-child(3).is-encendida {
+  background-color: #4ade80;
+}
+
+.semaforo-rotulo {
+  margin: 0;
+  color: #737373;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.semaforo-titulo {
+  margin: 2px 0 0;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--color-nivel);
+}
+
+.semaforo-consejo {
+  margin: 2px 0 0;
+  font-weight: 600;
+  color: #262626;
+}
+
+.semaforo-puntos {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  color: #525252;
+  white-space: nowrap;
+  line-height: 1.1;
+}
+
+.semaforo-puntos-valor {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.semaforo-puntos-valor strong {
+  font-size: 32px;
+  color: var(--color-nivel);
+}
+
+.semaforo-puntos-texto {
+  font-size: 12px;
+}
+
+/* Barra de 10 casillas */
+.semaforo-barra {
+  display: flex;
+  gap: 4px;
+  margin-top: 16px;
+}
+
+.semaforo-barra span {
+  flex: 1;
+  height: 8px;
+  border-radius: 4px;
+  background-color: #e5e5e4;
+}
+
+.semaforo-barra span.is-llena {
+  background-color: var(--color-nivel);
+}
+
+.semaforo-veto {
+  margin: 14px 0 0;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background-color: #fef2f2;
+  color: #7f1d1d;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.semaforo-nota {
+  margin: 12px 0 0;
+  color: #404040;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.semaforo-lista {
+  margin: 8px 0 0;
+  padding-left: 20px;
+  color: #404040;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.semaforo-pie {
+  margin: 14px 0 0;
+  color: #737373;
+  font-size: 13px;
+  line-height: 1.5;
+}

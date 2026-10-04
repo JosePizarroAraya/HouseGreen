@@ -5,6 +5,7 @@ import { useProperties } from "../context/PropertiesContext";
 import { useFavorites } from "../context/FavoritesContext";
 import { RiskBadge } from "../components/RiskBadge";
 import { GaleriaFotos } from "../components/GaleriaFotos";
+import { TarjetaSemaforo } from "../components/TarjetaSemaforo";
 import "./PropertyDetailPage.css";
 
 function formatCLP(value: string | number) {
@@ -52,6 +53,43 @@ function textoFaltan(dias: number) {
   return `En ${dias} días`;
 }
 
+// Paso 54: sitios oficiales donde se revisa lo que HouseGreen no puede confirmar por su cuenta
+// Paso 54: lo que hay que revisar en los sitios oficiales antes de ofertar.
+// Van en orden porque el rol que se obtiene en el primero se usa en el segundo.
+// Paso 54: lo que hay que revisar en los sitios oficiales antes de ofertar.
+// Van en orden porque el rol que se obtiene en el primero se usa en el segundo.
+const VERIFICACIONES = [
+  {
+    titulo: "Averigua el rol de la propiedad",
+    texto:
+      "En el menú Servicios online, entra a «Avalúos y contribuciones de bienes raíces» y busca la propiedad por comuna y dirección. Anota su rol (dos números, por ejemplo 1234-56) y su avalúo fiscal.",
+    sitio: "Impuestos Internos (SII)",
+    url: "https://www.sii.cl/",
+  },
+  {
+    titulo: "Revisa si debe contribuciones",
+    texto:
+      "Con la comuna y el rol, pide el certificado de deuda de contribuciones. Esa deuda sigue a la propiedad, no al dueño anterior.",
+    sitio: "Tesorería (TGR)",
+    url: "https://tgr.gob.cl/",
+  },
+  {
+    titulo: "Pide los certificados de la propiedad",
+    texto:
+      "Son dos: dominio vigente (quién es el dueño) e hipotecas, gravámenes y prohibiciones (qué deudas o embargos tiene). Se piden con la foja, el número y el año de la inscripción, que aparecen en el anuncio del remate. Tienen costo.",
+    sitio: "Conservador de Bienes Raíces",
+    url: "https://conservadoresdigitales.cl/",
+  },
+];
+
+// Paso 54: texto que se le pasa a Google Maps.
+// Las direcciones del scraper ya vienen completas ("..., San Miguel, Santiago, Chile");
+// a las demás se les agrega la comuna y el país para que el mapa no se confunda de ciudad.
+function direccionParaMapa(direccion: string, comuna: string | undefined) {
+  if (direccion.trim().toLowerCase().endsWith("chile")) return direccion;
+  return comuna ? `${direccion}, ${comuna}, Chile` : `${direccion}, Chile`;
+}
+
 export function PropertyDetailPage() {
   const { id } = useParams<{ id: string }>();
   const { properties, comunasPorId, cargando } = useProperties();
@@ -86,6 +124,19 @@ export function PropertyDetailPage() {
 
   const comuna = comunasPorId[property.comuna_id] ?? "Comuna desconocida";
   const favorito = esFavorito(property.id);
+
+  // Paso 54: enlace a Google Maps con la dirección de la propiedad (solo si tiene dirección)
+  const urlMapa = property.address
+    ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+        direccionParaMapa(property.address, comunasPorId[property.comuna_id]),
+      )}`
+    : null;
+
+      // Paso 55: publicación original del remate, solo para las propiedades que cargó el scraper
+  const urlOriginal =
+    property.source_system === "rematesinmobiliarios" && property.source_reference
+      ? `https://www.rematesinmobiliarios.cl/ficha-remate.php?id=${encodeURIComponent(property.source_reference)}`
+      : null;
 
   const precio = Number(property.opening_price);
   const fisica = property.physical_info;
@@ -131,7 +182,7 @@ export function PropertyDetailPage() {
 
       {/* Galería (paso 29): todas las fotos que subió el admin; si no hay, la imagen de siempre.
           key hace que se reinicie al cambiar de propiedad */}
-        <GaleriaFotos
+      <GaleriaFotos
         key={property.id}
         propertyId={property.id}
         imagenRespaldo={property.image_url}
@@ -148,7 +199,13 @@ export function PropertyDetailPage() {
         )}
       </div>
       <h1 className="detail-titulo">{property.title}</h1>
-      {property.address && <p className="detail-address">{property.address}</p>}
+      {/* Paso 54c: si el remate no trae dirección, se dice en vez de dejar el espacio vacío */}
+      <p className="detail-address">{property.address || "Sin dirección informada"}</p>
+      {urlMapa && (
+        <a className="detail-mapa" href={urlMapa} target="_blank" rel="noopener noreferrer">
+          Ver en Google Maps ↗
+        </a>
+      )}
 
       <div className="detail-precio">
         <p className="detail-precio-etiqueta">Precio mínimo</p>
@@ -164,6 +221,39 @@ export function PropertyDetailPage() {
             {dato.aviso && <span className="detail-dato-aviso">{dato.aviso}</span>}
           </div>
         ))}
+      </div>
+
+      <TarjetaSemaforo evaluacion={property.evaluation} />
+
+            {/* Paso 54: lo que conviene revisar en los sitios oficiales antes del remate */}
+      <div className="detail-seccion">
+        <h2>Verifica antes de ofertar</h2>
+        <p className="detail-verifica-intro">
+          HouseGreen no reemplaza la revisión de los documentos. Antes del remate, sigue estos pasos en los sitios
+          oficiales:
+        </p>
+        <ol className="detail-verifica">
+          {VERIFICACIONES.map((v, i) => (
+            <li key={v.titulo}>
+              <span className="detail-verifica-numero">{i + 1}</span>
+              <div className="detail-verifica-info">
+                <p className="detail-verifica-titulo">{v.titulo}</p>
+                <p className="detail-verifica-texto">{v.texto}</p>
+                <a href={v.url} target="_blank" rel="noopener noreferrer">
+                  Ir a {v.sitio} ↗
+                </a>
+              </div>
+            </li>
+          ))}
+        </ol>
+        {urlOriginal && (
+          <p className="detail-original">
+            El tribunal, la garantía y el anuncio completo están en la publicación original del remate.{" "}
+            <a href={urlOriginal} target="_blank" rel="noopener noreferrer">
+              Ver la publicación original ↗
+            </a>
+          </p>
+        )}
       </div>
 
       {property.description && (

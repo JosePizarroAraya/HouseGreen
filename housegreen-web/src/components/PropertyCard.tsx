@@ -116,7 +116,7 @@ export function PropertyCard({ property }: PropertyCardProps) {
         <div className="property-card-info">
           <p className="property-card-comuna">{nombreComuna}</p>
           <h3 className="property-card-title">{property.title}</h3>
-          {property.address && <p className="property-card-address">{property.address}</p>}
+          <p className="property-card-address">{property.address || "Sin dirección informada"}</p>
 
           <p className="property-card-label">Precio mínimo</p>
           <div className="property-card-precios">

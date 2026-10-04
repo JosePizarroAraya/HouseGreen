@@ -190,3 +190,108 @@
     font-size: 26px;
   }
 }
+/* Paso 54: enlace a Google Maps, debajo de la dirección */
+.detail-mapa {
+  display: inline-block;
+  margin-top: 8px;
+  color: #15803d;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.detail-mapa:hover {
+  text-decoration: underline;
+}
+
+/* Paso 54: "Verifica antes de ofertar" */
+.detail-verifica-intro {
+  margin: 0;
+  color: #404040;
+  line-height: 1.5;
+}
+
+.detail-verifica {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+  border: 1px solid #e5e5e4;
+  border-radius: 12px;
+  background-color: white;
+  overflow: hidden;
+}
+
+/* Cada paso: el número a la izquierda y, a su derecha, la explicación con el enlace debajo */
+.detail-verifica li {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+}
+
+.detail-verifica li + li {
+  border-top: 1px solid #e5e5e4;
+}
+
+.detail-verifica-numero {
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background-color: #dcfce7;
+  color: #166534;
+  font-size: 14px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.detail-verifica-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.detail-verifica-titulo {
+  margin: 2px 0 0;
+  font-weight: 700;
+  color: #171717;
+}
+
+.detail-verifica-texto {
+  margin: 4px 0 0;
+  color: #525252;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.detail-verifica a {
+  display: inline-block;
+  margin-top: 8px;
+  color: #15803d;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.detail-verifica a:hover {
+  text-decoration: underline;
+}
+/* Paso 55: enlace a la publicación original, debajo de los tres pasos */
+.detail-original {
+  margin: 12px 0 0;
+  color: #525252;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.detail-original a {
+  color: #15803d;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.detail-original a:hover {
+  text-decoration: underline;
+}

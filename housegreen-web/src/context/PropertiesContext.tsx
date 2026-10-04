@@ -9,13 +9,25 @@ interface PropertyApiResponse {
   address: string | null;
   comuna_id: number;
   property_type: string;
-  auction_type: "judicial" | "contribuciones" | "banco";
+  auction_type: "judicial" | "contribuciones" | "banco" | "extrajudicial";
   opening_price: string;
   auction_date: string | null; // fecha y hora del remate (paso 37); null si no se conoce
   image_url: string | null;
   description: string | null;
+  // Paso 55: de dónde viene la propiedad. Los remates del scraper traen
+  // source_system = "rematesinmobiliarios" y en source_reference el número del remate en ese sitio
+  source_system: string | null;
+  source_reference: string | null;
   physical_info: { bedrooms: number | null; bathrooms: number | null; surface_m2: string | null } | null;
-  evaluation: { result_level: "verde" | "amarillo" | "rojo" } | null;
+    // Última evaluación del semáforo (null si todavía no se ha evaluado)
+  evaluation: {
+    result_level: "verde" | "amarillo" | "rojo";
+    total_points: number | null; // 0 a 10; null si faltan datos para calcular
+    veto_applied: boolean;
+    veto_reason: string | null; // motivo del veto o lista de datos que faltan
+    is_complete: boolean; // false = faltan datos, no se pudo calcular el puntaje
+    evaluated_at: string;
+  } | null;
   created_at: string; // fecha de publicación (para ordenar por "Más recientes")
 }
 
