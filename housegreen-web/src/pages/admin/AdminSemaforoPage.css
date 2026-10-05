@@ -1,0 +1,263 @@
+/* Paso 68: apartado "Semáforo" del administrador (paleta "Menta sereno") */
+
+.sem-ayuda {
+  margin-top: 16px;
+  padding: 12px 16px;
+  border: 1px solid #dce6e1;
+  border-radius: 14px;
+  background-color: #f2f6f4;
+  color: #0f3d30;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.sem-ayuda p {
+  margin: 0;
+}
+
+.sem-ayuda ul {
+  margin: 6px 0 0;
+  padding-left: 20px;
+}
+
+/* Pestañas Pendientes / Revisadas */
+.sem-pestanas {
+  display: flex;
+  gap: 4px;
+  margin-top: 16px;
+  padding: 4px;
+  border-radius: 14px;
+  background-color: #e4ece8;
+}
+
+.sem-pestana {
+  flex: 1;
+  padding: 10px 12px;
+  border: none;
+  border-radius: 10px;
+  background-color: transparent;
+  color: #4e625b;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.sem-pestana.is-activa {
+  background-color: white;
+  color: #0f3d30;
+  box-shadow: 0 1px 2px rgba(15, 61, 48, 0.15);
+}
+
+.sem-vacio {
+  margin-top: 16px;
+  padding: 24px;
+  border: 1px dashed #9ad3bb;
+  border-radius: 14px;
+  background-color: white;
+  color: #4e625b;
+  text-align: center;
+}
+
+.sem-lista {
+  list-style: none;
+  margin: 16px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sem-item {
+  padding: 14px 16px;
+  border: 1px solid #dce6e1;
+  border-radius: 16px;
+  background-color: white;
+}
+
+/* Título y datos a la izquierda, distintivo del semáforo a la derecha */
+.sem-cabecera {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.sem-cabecera .pub-zona {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.sem-info {
+  min-width: 0;
+}
+
+.sem-titulo {
+  margin: 0;
+  font-size: 17px;
+  color: #0f3d30;
+}
+
+.sem-meta {
+  margin: 4px 0 0;
+  color: #4e625b;
+  font-size: 14px;
+}
+
+.sem-precio {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 8px;
+  margin: 10px 0 0;
+  color: #4e625b;
+  font-size: 14px;
+}
+
+.sem-precio strong {
+  color: #0f3d30;
+  font-size: 17px;
+}
+
+.sem-precio a {
+  margin-left: auto;
+  color: #1d6f55;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.sem-precio a:hover {
+  text-decoration: underline;
+}
+
+.sem-controles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 24px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #e8efec;
+}
+
+.sem-grupo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.sem-etiqueta {
+  margin-right: 2px;
+  color: #4e625b;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+/* Botones de zona: contorno cuando no están elegidos, relleno cuando sí */
+.sem-zona {
+  padding: 7px 14px;
+  border: 1px solid #c9d6d0;
+  border-radius: 999px;
+  background-color: white;
+  color: #0f3d30;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.sem-zona:hover:not(:disabled) {
+  border-color: #1d6f55;
+}
+
+.sem-zona-verde.is-elegida {
+  border-color: #2b6630;
+  background-color: #2b6630;
+  color: white;
+}
+
+.sem-zona-amarillo.is-elegida {
+  border-color: #e0a100;
+  background-color: #f6c343;
+  color: #3d2c00;
+}
+
+.sem-zona-rojo.is-elegida {
+  border-color: #a2322a;
+  background-color: #a2322a;
+  color: white;
+}
+
+.sem-zona:disabled,
+.sem-quitar:disabled,
+.sem-select:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.sem-quitar {
+  padding: 7px 8px;
+  border: none;
+  background: none;
+  color: #4e625b;
+  font-size: 13px;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.sem-select {
+  max-width: 100%;
+  padding: 7px 10px;
+  border: 1px solid #c9d6d0;
+  border-radius: 10px;
+  background-color: white;
+  color: #0f3d30;
+  font-size: 14px;
+}
+
+.sem-estado {
+  margin: 10px 0 0;
+  color: #4e625b;
+  font-size: 13px;
+}
+
+.sem-error {
+  margin: 10px 0 0;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background-color: #fae3e0;
+  color: #a2322a;
+  font-size: 14px;
+}
+
+.sem-mas {
+  margin-top: 20px;
+  text-align: center;
+  color: #4e625b;
+  font-size: 14px;
+}
+
+.sem-mas p {
+  margin: 0 0 10px;
+}
+
+.sem-boton-mas {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 999px;
+  background-color: #1d6f55;
+  color: white;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.sem-boton-mas:hover {
+  background-color: #0f3d30;
+}
+
+/* Paso 70: aviso de los remates finalizados que no se muestran */
+.sem-nota {
+  margin: 4px 0 0;
+  color: #4e625b;
+  font-size: 13px;
+}

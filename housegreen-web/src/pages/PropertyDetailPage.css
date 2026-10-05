@@ -277,21 +277,19 @@
 .detail-verifica a:hover {
   text-decoration: underline;
 }
-/* Paso 55: enlace a la publicación original, debajo de los tres pasos */
-.detail-original {
-  margin: 12px 0 0;
+
+/* Paso 69: remate que ya se realizó */
+.detail-dato-aviso.is-finalizado {
+  background-color: #e5e5e4;
   color: #525252;
-  font-size: 14px;
+}
+
+.detail-finalizado {
+  margin: 16px 0 0;
+  padding: 12px 14px;
+  border: 1px solid #d4d4d4;
+  border-radius: 12px;
+  background-color: #f5f5f4;
+  color: #404040;
   line-height: 1.5;
-}
-
-.detail-original a {
-  color: #15803d;
-  font-weight: 600;
-  text-decoration: none;
-  white-space: nowrap;
-}
-
-.detail-original a:hover {
-  text-decoration: underline;
 }

@@ -83,13 +83,15 @@
     padding: 8px 4px calc(8px + env(safe-area-inset-bottom));
   }
 
+  /* Paso 68: con cinco secciones cada una ocupa lo que mide su texto, y la letra es un poco más chica */
   .admin-nav-link {
-    flex: 1;
+    flex: 1 1 auto;
     text-align: center;
     border-radius: 999px;
     border-bottom: none;
-    padding: 10px 4px;
-    font-size: 13px;
+    padding: 10px 2px;
+    font-size: 12px;
+    white-space: nowrap;
   }
 
   .admin-nav-link.is-activo {

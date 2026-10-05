@@ -12,6 +12,7 @@ interface PropertyApiResponse {
   auction_type: "judicial" | "contribuciones" | "banco" | "extrajudicial";
   opening_price: string;
   auction_date: string | null; // fecha y hora del remate (paso 37); null si no se conoce
+  status: string; // paso 71: "disponible", o "retirada" si el sitio de origen quitó el remate
   image_url: string | null;
   description: string | null;
   // Paso 55: de dónde viene la propiedad. Los remates del scraper traen
@@ -26,6 +27,8 @@ interface PropertyApiResponse {
     veto_applied: boolean;
     veto_reason: string | null; // motivo del veto o lista de datos que faltan
     is_complete: boolean; // false = faltan datos, no se pudo calcular el puntaje
+    missing_data: string | null; // paso 63: los datos que faltaban, separados por "; "
+    details: { criteria_name: string; points: number; has_data: boolean }[];
     evaluated_at: string;
   } | null;
   created_at: string; // fecha de publicación (para ordenar por "Más recientes")

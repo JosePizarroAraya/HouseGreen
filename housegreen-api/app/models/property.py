@@ -70,6 +70,8 @@ class PropertyFinancialInfo(Base):
     estimated_value_arv = Column(Numeric(14, 2))
     repair_cost = Column(Numeric(14, 2))
     expected_return = Column(Numeric(6, 2))
+    # Paso 57 (semáforo v2): zona del factor Precio que elige el administrador (vacío = sin definir)
+    market_zone = Column(ENUM("verde", "amarillo", "rojo", name="semaforo_level"))
 
 class PropertyLegalInfo(Base):
     __tablename__ = "property_legal_info"
@@ -85,6 +87,7 @@ class PropertyLegalInfo(Base):
     lifetime_usufruct = Column(Boolean, default=False)
     unresolved_inheritance = Column(Boolean, default=False)
     expropriation_ban = Column(Boolean, default=False)
+    domain_type = Column(String(20))
 
 class PropertyPhysicalInfo(Base):
     __tablename__ = "property_physical_info"
@@ -122,6 +125,7 @@ class PropertyEvaluation(Base):
     veto_applied = Column(Boolean, default=False)
     veto_reason = Column(Text)
     is_complete = Column(Boolean, default=False)
+    missing_data = Column(Text)
     evaluated_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
 
 class PropertyMarketComparable(Base):
@@ -167,3 +171,45 @@ class PropertyPhoto(Base):
     label = Column(String(40))
     position = Column(Integer, nullable=False, default=0)
     created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
+
+class PropertyAuctionInfo(Base):
+    # Datos del remate que el scraper lee de la ficha del sitio de origen (tabla del paso 60).
+    # Una fila por propiedad.
+    __tablename__ = "property_auction_info"
+
+    property_id = Column(UUID(as_uuid=True), ForeignKey("properties.id", ondelete="CASCADE"), primary_key=True)
+    source_title = Column(Text)             # título de la ficha
+    origin = Column(String(100))            # por ejemplo "Juicio Ejecutivo"
+    court = Column(String(200))             # tribunal
+    case_number = Column(String(50))        # rol de la causa
+    modality = Column(String(50))           # Presencial o Virtual
+    place = Column(Text)                    # lugar del remate
+    guarantee_amount = Column(Numeric(14, 2))
+    guarantee_text = Column(Text)
+    payment_method = Column(Text)
+    payment_term = Column(Text)
+    requirements = Column(Text)
+    conditions = Column(Text)
+    announcement = Column(Text)
+    observations = Column(Text)
+    updated_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
+
+class SemaforoCriteria(Base):
+    # Los factores del semáforo (precio_rentabilidad, estado_legal, dinamismo_barrio, seguridad_comuna)
+    __tablename__ = "semaforo_criteria"
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String(100), nullable=False)
+    active = Column(Boolean, default=True)
+
+
+class EvaluationDetail(Base):
+    # Paso 64: puntos que aportó cada factor en una evaluación.
+    # criteria_value queda vacío cuando el factor no tenía dato (por eso vale 0 puntos).
+    __tablename__ = "evaluation_details"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    evaluation_id = Column(UUID(as_uuid=True), ForeignKey("property_evaluations.id", ondelete="CASCADE"), nullable=False)
+    criteria_id = Column(Integer, ForeignKey("semaforo_criteria.id"), nullable=False)
+    criteria_value = Column(Numeric(14, 4))
+    contribution = Column(Numeric(6, 2))

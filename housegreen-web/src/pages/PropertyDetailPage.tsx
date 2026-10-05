@@ -6,6 +6,8 @@ import { useFavorites } from "../context/FavoritesContext";
 import { RiskBadge } from "../components/RiskBadge";
 import { GaleriaFotos } from "../components/GaleriaFotos";
 import { TarjetaSemaforo } from "../components/TarjetaSemaforo";
+import { DatosRemate } from "../components/DatosRemate";
+import { remateFinalizado, remateRetirado } from "../components/estadoRemate";
 import "./PropertyDetailPage.css";
 
 function formatCLP(value: string | number) {
@@ -47,10 +49,14 @@ function diasHasta(fecha: Date) {
 }
 
 function textoFaltan(dias: number) {
-  if (dias < 0) return "Fecha ya pasada";
-  if (dias === 0) return "Hoy";
+  if (dias <= 0) return "Hoy";
   if (dias === 1) return "Mañana";
   return `En ${dias} días`;
+}
+
+// Paso 69: "lunes 5 de octubre", para el aviso de remate finalizado
+function fechaLarga(fecha: Date) {
+  return fecha.toLocaleDateString("es-CL", { weekday: "long", day: "numeric", month: "long" }).replace(",", "");
 }
 
 // Paso 54: sitios oficiales donde se revisa lo que HouseGreen no puede confirmar por su cuenta
@@ -76,7 +82,7 @@ const VERIFICACIONES = [
   {
     titulo: "Pide los certificados de la propiedad",
     texto:
-      "Son dos: dominio vigente (quién es el dueño) e hipotecas, gravámenes y prohibiciones (qué deudas o embargos tiene). Se piden con la foja, el número y el año de la inscripción, que aparecen en el anuncio del remate. Tienen costo.",
+      "Son dos: dominio vigente (quién es el dueño) e hipotecas, gravámenes y prohibiciones (qué deudas o embargos tiene). Se piden con la foja, el número y el año de la inscripción, que aparecen en el anuncio del remate (más arriba, en Datos del remate). Tienen costo.",
     sitio: "Conservador de Bienes Raíces",
     url: "https://conservadoresdigitales.cl/",
   },
@@ -132,12 +138,6 @@ export function PropertyDetailPage() {
       )}`
     : null;
 
-      // Paso 55: publicación original del remate, solo para las propiedades que cargó el scraper
-  const urlOriginal =
-    property.source_system === "rematesinmobiliarios" && property.source_reference
-      ? `https://www.rematesinmobiliarios.cl/ficha-remate.php?id=${encodeURIComponent(property.source_reference)}`
-      : null;
-
   const precio = Number(property.opening_price);
   const fisica = property.physical_info;
   const superficie = fisica?.surface_m2 ? Number(fisica.surface_m2) : null;
@@ -146,16 +146,20 @@ export function PropertyDetailPage() {
   // Fecha del remate: las 00:00 significan "hora no informada" (igual que en la tarjeta)
   const remate = property.auction_date ? new Date(property.auction_date) : null;
   const remateConHora = remate !== null && (remate.getHours() !== 0 || remate.getMinutes() !== 0);
+  const finalizado = remateFinalizado(property.auction_date);
+    // Paso 71: el sitio de origen quitó este remate
+  const retirado = remateRetirado(property.status);
 
   // Paso 51: datos de la propiedad. Solo se agregan los que existen,
   // así no aparecen casillas vacías ni guiones.
-  const datos: { etiqueta: string; valor: string; aviso?: string }[] = [];
+  const datos: { etiqueta: string; valor: string; aviso?: string; avisoGris?: boolean }[] = [];
   if (remate) {
     const hora = remate.toLocaleTimeString("es-CL", { hour: "2-digit", minute: "2-digit", hour12: false });
     datos.push({
       etiqueta: "Fecha del remate",
       valor: remateConHora ? `${fechaCorta(remate)} · ${hora}` : fechaCorta(remate),
-      aviso: textoFaltan(diasHasta(remate)),
+      aviso: retirado ? "Retirado" : finalizado ? "Finalizado" : textoFaltan(diasHasta(remate)),
+      avisoGris: retirado || finalizado,
     });
   }
   datos.push({ etiqueta: "Publicado", valor: fechaCorta(new Date(property.created_at), true) });
@@ -180,9 +184,22 @@ export function PropertyDetailPage() {
         </button>
       </div>
 
+        {retirado && (
+        <p className="detail-finalizado" role="status">
+          <strong>El sitio de origen retiró este remate.</strong> Puede haberse suspendido o cancelado. Se mantiene aquí
+          solo como referencia.
+        </p>
+      )}
+
+      {finalizado && !retirado && remate && (
+        <p className="detail-finalizado" role="status">
+          <strong>Este remate ya se realizó</strong> el {fechaLarga(remate)}. Se mantiene aquí solo como referencia.
+        </p>
+      )}
+
       {/* Galería (paso 29): todas las fotos que subió el admin; si no hay, la imagen de siempre.
           key hace que se reinicie al cambiar de propiedad */}
-      <GaleriaFotos
+        <GaleriaFotos
         key={property.id}
         propertyId={property.id}
         imagenRespaldo={property.image_url}
@@ -218,12 +235,17 @@ export function PropertyDetailPage() {
           <div key={dato.etiqueta} className="detail-dato">
             <p className="detail-dato-etiqueta">{dato.etiqueta}</p>
             <p className="detail-dato-valor">{dato.valor}</p>
-            {dato.aviso && <span className="detail-dato-aviso">{dato.aviso}</span>}
+            {dato.aviso && (
+            <span className={`detail-dato-aviso ${dato.avisoGris ? "is-finalizado" : ""}`}>{dato.aviso}</span>
+            )}
           </div>
         ))}
       </div>
 
       <TarjetaSemaforo evaluacion={property.evaluation} />
+      
+      {/* Paso 66: tribunal, rol, modalidad, garantía y anuncio. key hace que se reinicie al cambiar de propiedad */}
+      <DatosRemate key={property.id} propertyId={property.id} />
 
             {/* Paso 54: lo que conviene revisar en los sitios oficiales antes del remate */}
       <div className="detail-seccion">
@@ -246,14 +268,6 @@ export function PropertyDetailPage() {
             </li>
           ))}
         </ol>
-        {urlOriginal && (
-          <p className="detail-original">
-            El tribunal, la garantía y el anuncio completo están en la publicación original del remate.{" "}
-            <a href={urlOriginal} target="_blank" rel="noopener noreferrer">
-              Ver la publicación original ↗
-            </a>
-          </p>
-        )}
       </div>
 
       {property.description && (

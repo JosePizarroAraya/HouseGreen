@@ -74,6 +74,12 @@ class MarketDynamicsOut(BaseModel):
     class Config:
         from_attributes = True
 
+class EvaluationDetailOut(BaseModel):
+    # Paso 64: lo que aportó un factor del semáforo
+    criteria_name: str  # precio_rentabilidad, estado_legal, dinamismo_barrio o seguridad_comuna
+    points: int         # 0, 1 o 2
+    has_data: bool      # False = el factor no tenía dato (por eso vale 0)
+
 class EvaluationOut(BaseModel):
     result_level: str
     score: Decimal | None = None
@@ -81,7 +87,30 @@ class EvaluationOut(BaseModel):
     veto_applied: bool
     veto_reason: str | None = None
     is_complete: bool
+    missing_data: str | None = None  # Paso 63: datos que faltaban al evaluar (reglas v2)
+    details: list[EvaluationDetailOut] = []  # Paso 64: puntos de cada factor
     evaluated_at: datetime
+
+    class Config:
+        from_attributes = True
+
+class AuctionInfoOut(BaseModel):
+    # Paso 66: datos del remate leídos de la ficha del sitio de origen
+    source_title: str | None = None
+    origin: str | None = None            # por ejemplo "Juicio Ejecutivo"
+    court: str | None = None             # tribunal
+    case_number: str | None = None       # rol de la causa
+    modality: str | None = None          # Presencial o Virtual
+    place: str | None = None
+    guarantee_amount: Decimal | None = None
+    guarantee_text: str | None = None
+    payment_method: str | None = None
+    payment_term: str | None = None
+    requirements: str | None = None
+    conditions: str | None = None
+    announcement: str | None = None
+    observations: str | None = None
+    source_url: str | None = None        # dirección de la publicación original
 
     class Config:
         from_attributes = True

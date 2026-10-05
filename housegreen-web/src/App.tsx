@@ -8,6 +8,7 @@ import { EnConstruccion } from "./pages/admin/EnConstruccion";
 import { AdminPublicacionesPage } from "./pages/admin/AdminPublicacionesPage";
 import { AdminPublicacionDetallePage } from "./pages/admin/AdminPublicacionDetallePage";
 import { AdminEditarPublicacionPage } from "./pages/admin/AdminEditarPublicacionPage";
+import { AdminSemaforoPage } from "./pages/admin/AdminSemaforoPage";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { useAuth } from "./context/AuthContext";
 import { useAlerts } from "./context/AlertsContext";
@@ -86,6 +87,9 @@ function App() {
           <Route path="publicaciones/:id" element={<AdminPublicacionDetallePage />} />
 
           <Route path="publicaciones/:id/editar" element={<AdminEditarPublicacionPage />} />
+          
+          <Route path="semaforo" element={<AdminSemaforoPage />} />
+
 
           <Route
             path="opiniones"

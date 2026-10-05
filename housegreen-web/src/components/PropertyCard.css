@@ -158,3 +158,10 @@
   font-weight: 700;
   white-space: nowrap;
 }
+
+/* Paso 69: remate que ya se realizó (solo aparece en "Solo favoritos") */
+.property-card-details .property-card-finalizado {
+  background-color: #e5e5e4;
+  color: #525252;
+  font-weight: 700;
+}

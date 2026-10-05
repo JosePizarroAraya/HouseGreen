@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
-from sqlalchemy import func
+from sqlalchemy import func, text
 from sqlalchemy.orm import Session
 from uuid import UUID, uuid4
 from pathlib import Path
@@ -7,12 +7,15 @@ from pathlib import Path
 from app.database import get_db
 from app.auth.dependencies import requerir_admin
 from app.nube import subir_foto_a_la_nube, borrar_foto_de_la_nube, ErrorDeNube
-from app.models.property import Property, Comuna, PropertyEvaluation, PropertyView, PropertyPhoto
+from app.models.property import (
+    Property, Comuna, PropertyEvaluation, PropertyView, PropertyPhoto,
+    PropertyFinancialInfo, PropertyLegalInfo,
+)
 from app.models.favorite import SavedProperty
 from app.models.user import User
 from app.schemas.admin import (
     PublicacionAdmin, PublicacionDetalleAdmin, PersonaQueLaVio, PersonaQueLaGuardo, DescripcionIn, FotoOut,
-    FotoOrdenIn,
+    FotoOrdenIn, SemaforoAdminIn, SemaforoAdminOut,
 )
 
 # Todas las rutas de este archivo son solo para el administrador (role_id 3)
@@ -66,6 +69,10 @@ def listar_publicaciones(db: Session = Depends(get_db), usuario=Depends(requerir
     for property_id, url in db.query(PropertyPhoto.property_id, PropertyPhoto.url).order_by(PropertyPhoto.position):
         portadas.setdefault(property_id, url)  # setdefault guarda solo la primera que aparece
 
+    # 4c) Paso 67: lo que el admin define del semáforo: { property_id: zona de precio } y { property_id: dominio }
+    zonas_de_precio = dict(db.query(PropertyFinancialInfo.property_id, PropertyFinancialInfo.market_zone).all())
+    dominios = dict(db.query(PropertyLegalInfo.property_id, PropertyLegalInfo.domain_type).all())
+
     # 5) Se arma una fila por propiedad; si no tiene vistas o guardados, va con 0
     resultado = []
     for propiedad in db.query(Property).all():
@@ -84,6 +91,10 @@ def listar_publicaciones(db: Session = Depends(get_db), usuario=Depends(requerir
                 vistas=n_vistas,
                 personas=n_personas,
                 guardados=guardados.get(propiedad.id, 0),
+                opening_price=propiedad.opening_price,
+                auction_date=propiedad.auction_date,
+                market_zone=zonas_de_precio.get(propiedad.id),
+                domain_type=dominios.get(propiedad.id),
             )
         )
     return resultado
@@ -318,3 +329,47 @@ def ordenar_fotos(
         foto.label = (dato.label or "").strip() or None  # etiqueta vacía = sin etiqueta
     db.commit()
     return _fotos_ordenadas(db, property_id)
+
+@router.patch("/publicaciones/{property_id}/semaforo", response_model=SemaforoAdminOut)
+def definir_semaforo(
+    property_id: UUID, datos: SemaforoAdminIn, db: Session = Depends(get_db), usuario=Depends(requerir_admin)
+):
+    # Paso 67: el admin elige la zona de precio y/o el tipo de dominio de una propiedad.
+    # Después se recalcula el semáforo y se devuelve cómo quedó.
+    propiedad = db.query(Property).filter(Property.id == property_id).first()
+    if not propiedad:
+        raise HTTPException(status_code=404, detail="Propiedad no encontrada")
+
+    # model_fields_set = los campos que de verdad vinieron en la petición (los demás no se tocan)
+    financiero = db.query(PropertyFinancialInfo).filter_by(property_id=property_id).first()
+    if "market_zone" in datos.model_fields_set:
+        if not financiero:
+            financiero = PropertyFinancialInfo(property_id=property_id)
+            db.add(financiero)
+        financiero.market_zone = datos.market_zone
+
+    legal = db.query(PropertyLegalInfo).filter_by(property_id=property_id).first()
+    if "domain_type" in datos.model_fields_set:
+        if not legal:
+            legal = PropertyLegalInfo(property_id=property_id)
+            db.add(legal)
+        legal.domain_type = datos.domain_type
+
+    db.commit()
+
+    # Se recalcula con la función de la base (la misma que usa el resto de la API)
+    db.execute(text("SELECT calculate_score(:pid)"), {"pid": str(property_id)})
+    db.commit()
+
+    evaluacion = (
+        db.query(PropertyEvaluation)
+        .filter(PropertyEvaluation.property_id == property_id)
+        .order_by(PropertyEvaluation.evaluated_at.desc())
+        .first()
+    )
+    return SemaforoAdminOut(
+        market_zone=financiero.market_zone if financiero else None,
+        domain_type=legal.domain_type if legal else None,
+        result_level=evaluacion.result_level if evaluacion else None,
+        total_points=evaluacion.total_points if evaluacion else None,
+    )

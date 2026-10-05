@@ -1,0 +1,98 @@
+/* Paso 66: sección "Datos del remate" del detalle de la propiedad */
+
+/* Casillas iguales a las de los datos de la propiedad: el fondo gris del contenedor
+   y el espacio de 1px entre casillas dibujan las líneas divisorias */
+.remate-datos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1px;
+  border: 1px solid #e5e5e4;
+  border-radius: 12px;
+  background-color: #e5e5e4;
+  overflow: hidden;
+}
+
+.remate-dato {
+  flex: 1 1 200px;
+  min-width: 0;
+  padding: 14px 16px;
+  background-color: white;
+}
+
+.remate-dato-etiqueta {
+  margin: 0;
+  color: #737373;
+  font-size: 13px;
+}
+
+.remate-dato-valor {
+  margin: 4px 0 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: #171717;
+  overflow-wrap: anywhere; /* un texto largo sin espacios no debe ensanchar la página */
+}
+
+/* El sitio a veces escribe todo en minúsculas: al menos la primera letra va en mayúscula */
+.remate-dato-valor::first-letter,
+.remate-texto p::first-letter,
+.remate-anuncio p::first-letter {
+  text-transform: uppercase;
+}
+
+.remate-texto {
+  margin-top: 16px;
+}
+
+.remate-texto h3 {
+  margin: 0;
+  font-size: 15px;
+  color: #171717;
+}
+
+.remate-texto p {
+  margin: 4px 0 0;
+  color: #404040;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.remate-anuncio {
+  margin-top: 16px;
+  border: 1px solid #e5e5e4;
+  border-radius: 12px;
+  background-color: white;
+}
+
+.remate-anuncio summary {
+  padding: 12px 16px;
+  color: #15803d;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.remate-anuncio p {
+  margin: 0;
+  padding: 0 16px 14px;
+  color: #404040;
+  font-size: 14px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.remate-fuente {
+  margin: 12px 0 0;
+  color: #737373;
+  font-size: 13px;
+}
+
+.remate-fuente a {
+  color: #15803d;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.remate-fuente a:hover {
+  text-decoration: underline;
+}

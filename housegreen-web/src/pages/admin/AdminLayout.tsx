@@ -5,6 +5,7 @@ import "./AdminLayout.css";
 const SECCIONES = [
   { ruta: "/admin", texto: "Panel", exacta: true },
   { ruta: "/admin/publicaciones", texto: "Publicaciones", exacta: false },
+  { ruta: "/admin/semaforo", texto: "Semáforo", exacta: false },
   { ruta: "/admin/opiniones", texto: "Opiniones", exacta: false },
   { ruta: "/admin/anuncios", texto: "Anuncios", exacta: false },
 ];

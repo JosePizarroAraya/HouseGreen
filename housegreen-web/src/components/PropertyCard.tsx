@@ -5,6 +5,7 @@ import { useFavorites } from "../context/FavoritesContext";
 import { useProperties } from "../context/PropertiesContext";
 import { urlDeArchivo } from "../api/client";
 import { SinFoto } from "./SinFoto";
+import { remateFinalizado, remateRetirado } from "./estadoRemate";
 import "./PropertyCard.css";
 
 interface PropertyCardProps {
@@ -16,6 +17,7 @@ interface PropertyCardProps {
     property_type: string;
     opening_price: string;
     auction_date: string | null;
+    status?: string;
     image_url: string | null;
     physical_info: { bedrooms: number | null; bathrooms: number | null; surface_m2: string | null } | null;
     evaluation: { result_level: "verde" | "amarillo" | "rojo" } | null;
@@ -85,6 +87,10 @@ export function PropertyCard({ property }: PropertyCardProps) {
   if (fisica?.bedrooms) datos.push(`${fisica.bedrooms} dorm.`);
   if (fisica?.bathrooms) datos.push(`${fisica.bathrooms} ${fisica.bathrooms === 1 ? "baño" : "baños"}`);
   const remate = property.auction_date ? textoRemate(property.auction_date) : null;
+  // Paso 69: un remate ya realizado solo se ve en "Solo favoritos", marcado como finalizado
+  const finalizado = remateFinalizado(property.auction_date);
+    // Paso 71: remate que el sitio de origen quitó
+  const retirado = remateRetirado(property.status);
 
   return (
     <Link to={`/propiedades/${property.id}`} className="property-card">
@@ -124,12 +130,14 @@ export function PropertyCard({ property }: PropertyCardProps) {
             {precioM2 !== null && <span className="property-card-m2">{formatCLP(precioM2)} / m²</span>}
           </div>
 
-          {(datos.length > 0 || remate) && (
+          {(datos.length > 0 || remate || retirado) && (
             <div className="property-card-details">
               {datos.map((dato) => (
                 <span key={dato}>{dato}</span>
               ))}
-              {remate && <span className="property-card-remate">{remate}</span>}
+              {remate && !finalizado && !retirado && <span className="property-card-remate">{remate}</span>}
+              {retirado && <span className="property-card-finalizado">Remate retirado</span>}
+              {finalizado && !retirado && <span className="property-card-finalizado">Remate finalizado</span>}
             </div>
           )}
         </div>

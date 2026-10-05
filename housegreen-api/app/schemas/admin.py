@@ -1,3 +1,4 @@
+from typing import Literal
 from pydantic import BaseModel, Field
 from uuid import UUID
 from datetime import datetime
@@ -17,6 +18,11 @@ class PublicacionAdmin(BaseModel):
     vistas: int = 0      # visitas totales (tabla property_views)
     personas: int = 0    # personas distintas que la vieron
     guardados: int = 0   # cuántos la tienen en favoritos (tabla saved_properties)
+    # Paso 67: datos para que el admin complete el semáforo
+    opening_price: Decimal | None = None
+    auction_date: datetime | None = None
+    market_zone: str | None = None    # zona de precio que eligió el admin (None = todavía no la elige)
+    domain_type: str | None = None    # "exclusivo", "otro" o None (no especificado)
 
 
 
@@ -61,3 +67,17 @@ class FotoOrdenIn(BaseModel):
     # Una foto en el orden nuevo (paso 24): la primera de la lista queda como portada
     id: UUID
     label: str | None = Field(default=None, max_length=40)
+# --- Paso 67: lo que el admin define del semáforo ---
+
+class SemaforoAdminIn(BaseModel):
+    # Solo se cambia lo que se envía: se puede mandar la zona, el dominio o los dos.
+    # Enviar null borra el dato (vuelve a "sin revisar" o "no especificado").
+    market_zone: Literal["verde", "amarillo", "rojo"] | None = None
+    domain_type: Literal["exclusivo", "otro"] | None = None
+
+class SemaforoAdminOut(BaseModel):
+    # Cómo quedó la propiedad después de recalcular
+    market_zone: str | None = None
+    domain_type: str | None = None
+    result_level: str | None = None
+    total_points: int | None = None

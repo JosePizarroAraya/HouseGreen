@@ -9,8 +9,9 @@ from app.models.property import (
     Property, PropertyFinancialInfo, PropertyLegalInfo,
     PropertyPhysicalInfo, PropertyOccupancyInfo, PropertyMarketDynamics,
     PropertyEvaluation, PropertyMarketComparable, PropertyDebt, PropertyView, PropertyPhoto,
+        EvaluationDetail, SemaforoCriteria, PropertyAuctionInfo,
 )
-from app.schemas.property import PropertyOut, PropertyCreate
+from app.schemas.property import PropertyOut, PropertyCreate, EvaluationOut, EvaluationDetailOut, AuctionInfoOut
 from app.schemas.admin import FotoOut
 from app.auth.dependencies import get_current_user, requerir_admin
 from app.routers.alerts import notificar_nueva_propiedad
@@ -32,12 +33,42 @@ def _obtener_ultima_evaluacion(db: Session, property_id: UUID) -> PropertyEvalua
         .first()
     )
 
+def _detalles_de_evaluaciones(db: Session, evaluation_ids: list) -> dict:
+    # Paso 64: puntos de cada factor, para varias evaluaciones en UNA sola consulta.
+    # Devuelve un diccionario: id de la evaluación -> lista con sus 4 factores.
+    detalles = {}
+    if not evaluation_ids:
+        return detalles
+    filas = (
+        db.query(
+            EvaluationDetail.evaluation_id, SemaforoCriteria.name,
+            EvaluationDetail.contribution, EvaluationDetail.criteria_value,
+        )
+        .join(SemaforoCriteria, SemaforoCriteria.id == EvaluationDetail.criteria_id)
+        .filter(EvaluationDetail.evaluation_id.in_(evaluation_ids))
+        .order_by(SemaforoCriteria.id)
+    )
+    for evaluation_id, nombre, puntos, valor in filas:
+        detalles.setdefault(evaluation_id, []).append(
+            EvaluationDetailOut(criteria_name=nombre, points=int(puntos or 0), has_data=valor is not None)
+        )
+    return detalles
+
+def _evaluacion_con_detalle(evaluacion: PropertyEvaluation | None, detalles: dict) -> EvaluationOut | None:
+    # Paso 64: une la evaluación con el detalle de sus factores
+    if not evaluacion:
+        return None
+    salida = EvaluationOut.model_validate(evaluacion)
+    salida.details = detalles.get(evaluacion.id, [])
+    return salida
+
 def _armar_respuesta(db: Session, propiedad: Property) -> PropertyOut:
     # Junta la propiedad con su última evaluación de riesgo, para devolver todo junto.
     salida = PropertyOut.model_validate(propiedad)
     evaluacion = _obtener_ultima_evaluacion(db, propiedad.id)
     if evaluacion:
-        salida.evaluation = evaluacion
+        detalles = _detalles_de_evaluaciones(db, [evaluacion.id])
+        salida.evaluation = _evaluacion_con_detalle(evaluacion, detalles)
     # Paso 27: si el admin subió fotos, se muestra la portada en vez de la imagen original
     portada = (
         db.query(PropertyPhoto.url)
@@ -140,10 +171,13 @@ def listar_propiedades(db: Session = Depends(get_db), usuario=Depends(get_curren
     for property_id, url in db.query(PropertyPhoto.property_id, PropertyPhoto.url).order_by(PropertyPhoto.position):
         portadas.setdefault(property_id, url)
 
+    # Paso 64: detalle por factor de esas últimas evaluaciones (una sola consulta para todas)
+    detalles = _detalles_de_evaluaciones(db, [evaluacion.id for evaluacion in evaluaciones.values()])
+
     respuesta = []
     for propiedad in propiedades:
         salida = PropertyOut.model_validate(propiedad)
-        salida.evaluation = evaluaciones.get(propiedad.id)
+        salida.evaluation = _evaluacion_con_detalle(evaluaciones.get(propiedad.id), detalles)
         if propiedad.id in portadas:
             salida.image_url = portadas[propiedad.id]
         respuesta.append(salida)
@@ -281,3 +315,25 @@ def listar_fotos(property_id: UUID, db: Session = Depends(get_db), usuario=Depen
         .order_by(PropertyPhoto.position)
         .all()
     )
+
+# --- Datos del remate (paso 66) ---
+
+# Dirección de la ficha en el sitio de origen; al final va el número del remate
+URL_FICHA_ORIGEN = "https://www.rematesinmobiliarios.cl/ficha-remate.php?id="
+
+@router.get("/{property_id}/remate", response_model=AuctionInfoOut | None)
+def obtener_datos_del_remate(property_id: UUID, db: Session = Depends(get_db), usuario=Depends(get_current_user)):
+    # Datos que el scraper leyó de la ficha del remate: tribunal, rol de la causa, modalidad, garantía y anuncio.
+    # Devuelve null si la propiedad no los tiene (no vino del scraper, o el sitio retiró el remate).
+    propiedad = db.query(Property).filter(Property.id == property_id).first()
+    if not propiedad:
+        raise HTTPException(status_code=404, detail="Propiedad no encontrada")
+
+    info = db.get(PropertyAuctionInfo, property_id)
+    if not info:
+        return None
+
+    salida = AuctionInfoOut.model_validate(info)
+    if propiedad.source_system == "rematesinmobiliarios" and propiedad.source_reference:
+        salida.source_url = URL_FICHA_ORIGEN + propiedad.source_reference
+    return salida

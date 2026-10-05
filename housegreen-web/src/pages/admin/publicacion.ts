@@ -15,7 +15,15 @@ export interface PublicacionAdmin {
   vistas: number;
   personas: number;
   guardados: number;
+  // Paso 68: datos para completar el semáforo
+  opening_price: string | null;
+  auction_date: string | null;
+  market_zone: Zona | null; // zona de precio que eligió el admin (null = todavía no la elige)
+  domain_type: Dominio | null; // null = no especificado
 }
+
+export type Dominio = "exclusivo" | "otro";
+
 
 const NOMBRE_ZONA: Record<Zona, string> = { verde: "Verde", amarillo: "Amarilla", rojo: "Roja" };
 
@@ -26,7 +34,7 @@ export function nombreComuna(p: PublicacionAdmin) {
 // Texto del distintivo: "Verde · 9/10", "Roja · sin puntaje" o "Sin evaluar"
 export function textoZona(p: PublicacionAdmin) {
   if (!p.result_level) return "Sin evaluar";
-  const puntos = p.total_points === null ? "sin puntaje" : `${p.total_points}/10`;
+  const puntos = p.total_points === null ? "sin puntaje" : `${p.total_points}/8`;
   return `${NOMBRE_ZONA[p.result_level]} · ${puntos}`;
 }
 

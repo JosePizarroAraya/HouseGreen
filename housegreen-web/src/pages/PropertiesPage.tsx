@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useProperties } from "../context/PropertiesContext";
 import { PropertyCard } from "../components/PropertyCard";
 import { useFavorites } from "../context/FavoritesContext";
+import { remateFinalizado, remateRetirado } from "../components/estadoRemate";
 import "./PropertiesPage.css";
 
 type Riesgo = "verde" | "amarillo" | "rojo";
@@ -106,6 +107,9 @@ export function PropertiesPage() {
       return (
         coincideTexto &&
         (!soloFavoritos || esFavorito(p.id)) &&
+        // Pasos 69 y 71: los remates que ya se realizaron o que el sitio retiró no se muestran,
+        // salvo al ver "Solo favoritos"
+        (soloFavoritos || (!remateFinalizado(p.auction_date) && !remateRetirado(p.status))) &&
         (precioDesde === null || precio >= precioDesde) &&
         (precioHasta === null || precio <= precioHasta) &&
         (comunasElegidas.length === 0 || comunasElegidas.includes(nombreComuna)) &&
