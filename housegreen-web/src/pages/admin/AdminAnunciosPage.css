@@ -1,0 +1,395 @@
+/* Paso 88: apartado "Anuncios" del administrador (paleta "Menta sereno") */
+
+.anu-seccion {
+  margin: 0;
+  color: #0f3d30;
+  font-size: 17px;
+}
+
+.anu-seccion-enviados {
+  margin-top: 28px;
+}
+
+/* ---------- Nuevo anuncio ---------- */
+.anu-formulario {
+  margin-top: 16px;
+  padding: 16px 20px 20px;
+  border: 1px solid #dce6e1;
+  border-radius: 16px;
+  background-color: white;
+}
+
+/* fieldset trae borde y márgenes propios del navegador: se quitan */
+.anu-campos {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+.anu-etiqueta {
+  margin: 14px 0 6px;
+  color: #4e625b;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+/* Las cuatro opciones de "Para": dos columnas en computador, una en celular */
+.anu-para {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.anu-para-opcion {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border: 1px solid #c9d8d1;
+  border-radius: 12px;
+  background-color: white;
+  color: #0f3d30;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.anu-para-opcion.is-activa {
+  border-color: #1d6f55;
+  background-color: #e4f3ec;
+}
+
+.anu-para-opcion input {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  accent-color: #1d6f55;
+}
+
+.anu-campos:disabled .anu-para-opcion {
+  cursor: default;
+}
+
+.anu-nota {
+  margin: 10px 0 0;
+  color: #4e625b;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+/* Campos de texto */
+.anu-campo {
+  display: block;
+  margin-top: 14px;
+  color: #4e625b;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.anu-campo-arriba {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.anu-contador {
+  font-weight: 400;
+}
+
+.anu-campo input,
+.anu-campo textarea {
+  display: block;
+  width: 100%;
+  margin-top: 6px;
+  padding: 10px 12px;
+  border: 1px solid #c9d8d1;
+  border-radius: 10px;
+  box-sizing: border-box;
+  background-color: white;
+  color: #1f2a26;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1.4;
+}
+
+.anu-campo textarea {
+  resize: vertical;
+}
+
+.anu-campos:disabled input,
+.anu-campos:disabled textarea {
+  background-color: #f2f6f4;
+  color: #4e625b;
+}
+
+/* Buscador de personas o publicaciones */
+.anu-elegir .anu-campo {
+  margin-top: 12px;
+}
+
+.anu-opciones {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.anu-opciones button {
+  display: block;
+  width: 100%;
+  padding: 9px 12px;
+  border: 1px solid #dce6e1;
+  border-radius: 10px;
+  background-color: #f2f6f4;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.anu-opciones button:hover {
+  border-color: #1d6f55;
+  background-color: #e4f3ec;
+}
+
+.anu-opciones-titulo,
+.anu-opciones-detalle {
+  display: block;
+  overflow-wrap: anywhere;
+}
+
+.anu-opciones-titulo,
+.anu-elegida-titulo {
+  color: #0f3d30;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.anu-opciones-detalle,
+.anu-elegida-detalle {
+  color: #4e625b;
+  font-size: 13px;
+}
+
+/* La opción ya elegida */
+.anu-elegida {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+  padding: 10px 12px;
+  border: 1px solid #9ad3bb;
+  border-radius: 12px;
+  background-color: #e4f3ec;
+}
+
+.anu-elegida-texto {
+  min-width: 0;
+}
+
+.anu-elegida p {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+/* Botones */
+.anu-boton-enviar,
+.anu-boton-claro {
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.anu-boton-enviar {
+  border: none;
+  background-color: #1d6f55;
+  color: white;
+}
+
+.anu-boton-enviar:hover {
+  background-color: #0f3d30;
+}
+
+.anu-boton-claro {
+  flex-shrink: 0;
+  border: 1px solid #c9d8d1;
+  background-color: white;
+  color: #4e625b;
+}
+
+.anu-boton-enviar:disabled,
+.anu-boton-claro:disabled {
+  border-color: #c9d8d1;
+  background-color: #c9d8d1;
+  color: #4e625b;
+  cursor: not-allowed;
+}
+
+.anu-formulario > .anu-boton-enviar {
+  margin-top: 16px;
+}
+
+.anu-para-opcion:focus-within,
+.anu-campo input:focus-visible,
+.anu-campo textarea:focus-visible,
+.anu-opciones button:focus-visible,
+.anu-boton-enviar:focus-visible,
+.anu-boton-claro:focus-visible {
+  outline: 2px solid #1d6f55;
+  outline-offset: 2px;
+}
+
+/* Pregunta antes de enviar */
+.anu-confirmar {
+  margin-top: 16px;
+  padding: 12px 14px;
+  border: 1px solid #9ad3bb;
+  border-radius: 12px;
+  background-color: #e4f3ec;
+}
+
+.anu-confirmar p {
+  margin: 0;
+  color: #0f3d30;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.anu-confirmar-botones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+/* Mensajes */
+.anu-error {
+  margin-top: 12px;
+  padding: 12px 16px;
+  border-radius: 14px;
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+.anu-error-chico {
+  margin: 12px 0 0;
+  color: #991b1b;
+  font-size: 14px;
+}
+
+.anu-aviso {
+  margin: 12px 0 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background-color: #e4f3ec;
+  color: #0f3d30;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.anu-vacio {
+  margin-top: 12px;
+  padding: 24px;
+  border: 1px dashed #9ad3bb;
+  border-radius: 14px;
+  background-color: white;
+  color: #4e625b;
+  text-align: center;
+}
+
+/* ---------- Enviados ---------- */
+.anu-lista {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.anu-item {
+  padding: 14px 16px;
+  border: 1px solid #dce6e1;
+  border-radius: 16px;
+  background-color: white;
+}
+
+.anu-item-arriba {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+}
+
+.anu-item-arriba h3 {
+  min-width: 0;
+  margin: 0;
+  color: #0f3d30;
+  font-size: 16px;
+  overflow-wrap: anywhere;
+}
+
+.anu-item-fecha {
+  color: #4e625b;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.anu-item-para {
+  margin: 4px 0 0;
+  color: #1d6f55;
+  font-size: 13px;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.anu-item-mensaje {
+  margin: 8px 0 0;
+  color: #1f2a26;
+  font-size: 15px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap; /* respeta los saltos de línea del mensaje */
+}
+
+.anu-item-lectura {
+  margin: 10px 0 0;
+  padding-top: 8px;
+  border-top: 1px solid #e4ece8;
+  color: #4e625b;
+  font-size: 13px;
+}
+
+.anu-mas {
+  margin-top: 16px;
+  color: #4e625b;
+  font-size: 14px;
+  text-align: center;
+}
+
+.anu-mas p {
+  margin: 0 0 8px;
+}
+
+/* Celular */
+@media (max-width: 560px) {
+  .anu-formulario {
+    padding: 14px 14px 16px;
+  }
+
+  .anu-para {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

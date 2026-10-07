@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { useAlerts } from "../context/AlertsContext";
 import { mockProperties } from "../data/mockProperties";
 import type { RiskLevel } from "../types/property";
+import { MisAnuncios } from "../components/MisAnuncios";
 import "./AlertsPage.css";
 
 export function AlertsPage() {
@@ -35,6 +36,9 @@ export function AlertsPage() {
     <div className="alerts-page">
       <h1>Alertas</h1>
       <p className="alerts-subtitle">Configura criterios y te avisamos cuando aparezca algo que calce.</p>
+
+      {/* Paso 90: los anuncios que envía el administrador */}
+      <MisAnuncios />
 
       <form className="alerts-form" onSubmit={handleSubmit}>
         <input
@@ -89,7 +93,7 @@ export function AlertsPage() {
       <h2 className="alerts-section-title">Notificaciones</h2>
       {notificaciones.length === 0 && <p className="alerts-empty">No tienes notificaciones todavía.</p>}
 
-            <ul className="alerts-notification-list">
+      <ul className="alerts-notification-list">
         {notificaciones.map((n) => {
           const propiedad = obtenerPropiedad(n.propertyId);
           if (!propiedad) return null;
@@ -110,7 +114,5 @@ export function AlertsPage() {
         })}
       </ul>
     </div>
-    
   );
-  
 }

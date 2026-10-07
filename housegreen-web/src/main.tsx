@@ -5,6 +5,7 @@ import { AuthProvider } from './context/AuthContext'
 import { FavoritesProvider } from './context/FavoritesContext'
 import { AlertsProvider } from './context/AlertsContext'
 import { PropertiesProvider } from './context/PropertiesContext'
+import { AnunciosProvider } from './context/AnunciosContext'
 import './index.css'
 import App from './App.tsx'
 
@@ -15,7 +16,9 @@ createRoot(document.getElementById('root')!).render(
         <PropertiesProvider>
           <FavoritesProvider>
             <AlertsProvider>
-              <App />
+              <AnunciosProvider>
+                <App />
+              </AnunciosProvider>
             </AlertsProvider>
           </FavoritesProvider>
         </PropertiesProvider>
