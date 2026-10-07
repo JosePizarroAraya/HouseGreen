@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { MarcoDeEntrada } from "../components/MarcoDeEntrada";
 import "./LoginPage.css";
 
 export function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [mostrar, setMostrar] = useState(false); // ver la contraseña mientras se escribe
   const [error, setError] = useState("");
 
   // Paso 78: segundo paso del inicio de sesión (solo para cuentas con verificación en dos pasos)
@@ -53,7 +55,7 @@ export function LoginPage() {
   // Paso 78: pantalla del código
   if (pideCodigo) {
     return (
-      <div className="login-page">
+      <MarcoDeEntrada>
         {/* key distinta a la del otro formulario: así React lo crea de nuevo y el cursor queda en el código */}
         <form key="codigo" className="login-form" onSubmit={handleSubmit}>
           <h1>Verificación en dos pasos</h1>
@@ -61,7 +63,11 @@ export function LoginPage() {
             Abre tu aplicación de autenticación y escribe el código de 6 dígitos de HouseGreen.
           </p>
 
-          {error && <p className="login-error">{error}</p>}
+          {error && (
+            <p className="login-error" role="alert">
+              {error}
+            </p>
+          )}
 
           <label className="login-label">
             Código
@@ -89,22 +95,27 @@ export function LoginPage() {
             </button>
           </p>
         </form>
-      </div>
+      </MarcoDeEntrada>
     );
   }
 
   return (
-    <div className="login-page">
+    <MarcoDeEntrada>
       <form key="acceso" className="login-form" onSubmit={handleSubmit}>
         <h1>Iniciar sesión</h1>
-        <p className="login-subtitle">Accede a HouseGreen para ver propiedades en remate</p>
+        <p className="login-subtitle">Entra para ver los remates y su semáforo.</p>
 
-        {error && <p className="login-error">{error}</p>}
+        {error && (
+          <p className="login-error" role="alert">
+            {error}
+          </p>
+        )}
 
         <label className="login-label">
           Correo electrónico
           <input
             type="email"
+            autoComplete="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             className="login-input"
@@ -115,12 +126,18 @@ export function LoginPage() {
         <label className="login-label">
           Contraseña
           <input
-            type="password"
+            type={mostrar ? "text" : "password"}
+            autoComplete="current-password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             className="login-input"
             placeholder="••••••••"
           />
+        </label>
+
+        <label className="login-mostrar">
+          <input type="checkbox" checked={mostrar} onChange={(e) => setMostrar(e.target.checked)} />
+          Mostrar la contraseña
         </label>
 
         <button type="submit" className="login-button" disabled={cargando}>
@@ -131,6 +148,6 @@ export function LoginPage() {
           ¿No tienes cuenta? <Link to="/registro">Regístrate</Link>
         </p>
       </form>
-    </div>
+    </MarcoDeEntrada>
   );
 }

@@ -8,93 +8,141 @@ body {
   background-color: #f5f5f4;
   color: #1c1c1c;
 }
-.app-header {
-  padding: 16px 24px;
-  background-color: white;
-  border-bottom: 1px solid #e5e5e4;
-}
 
-.app-logo {
-  font-weight: 700;
-  font-size: 18px;
-  color: #15803d;
-}
+/* ---------- Encabezado: el logo a la izquierda y el menú a la derecha ---------- */
 .app-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 12px;
+  min-height: 60px;
+  padding: 0 24px;
+  border-bottom: 1px solid #e4e8e6;
+  background-color: white;
 }
 
-.app-logout-btn {
-  background: none;
-  border: 1px solid #d4d4d4;
-  border-radius: 8px;
-  padding: 6px 12px;
-  font-size: 13px;
-  cursor: pointer;
-  color: #404040;
+/* Logo: el semáforo y el nombre. Es un enlace al catálogo. */
+.app-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+  color: #0f3d30;
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  text-decoration: none;
 }
 
-.app-logout-btn:hover {
-  background-color: #f5f5f4;
+.app-logo svg {
+  display: block;
+  width: 28px;
+  height: 28px;
 }
+
 .app-header-actions {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 4px;
 }
 
-.app-alerts-link {
-  position: relative;
-  color: #404040;
+/* Cada enlace del menú */
+.app-nav-link {
+  padding: 8px 12px;
+  border-radius: 8px;
+  color: #2f3a35;
+  font-size: 15px;
   text-decoration: none;
-  font-size: 14px;
+  white-space: nowrap;
 }
 
-.app-alerts-link:hover {
-  text-decoration: underline;
+.app-nav-link:hover {
+  background-color: #f1f5f3;
 }
 
+/* La sección en la que está la persona queda marcada (sin negrita: la negrita ensancha
+   el texto y en celular empujaba el menú fuera de la pantalla) */
+.app-nav-link.is-activo {
+  background-color: #e4f3ec;
+  color: #0f3d30;
+}
+
+/* Número rojo de avisos sin leer */
 .app-alerts-badge {
+  margin-left: 4px;
+  padding: 1px 6px;
+  border-radius: 999px;
   background-color: #dc2626;
   color: white;
   font-size: 11px;
   font-weight: 700;
-  border-radius: 999px;
-  padding: 1px 6px;
-  margin-left: 4px;
-}
-
-/* --- Paso 31: encabezado en celular --- */
-.app-header {
-  gap: 12px;
-}
-
-.app-logo {
-  flex-shrink: 0;
-  text-decoration: none; /* ahora es un enlace al catálogo */
 }
 
 .app-logout-btn {
+  margin-left: 8px;
+  padding: 7px 14px;
+  border: 1px solid #c9d1cd;
+  border-radius: 8px;
+  background: none;
+  color: #2f3a35;
+  font-family: inherit;
+  font-size: 14px;
   white-space: nowrap;
+  cursor: pointer;
 }
 
-@media (max-width: 640px) {
+.app-logout-btn:hover {
+  border-color: #9aa5a0;
+  background-color: #f1f5f3;
+}
+
+.app-logo:focus-visible,
+.app-nav-link:focus-visible,
+.app-logout-btn:focus-visible {
+  outline: 3px solid rgba(21, 128, 61, 0.45);
+  outline-offset: 2px;
+}
+
+/* Celular: menos espacio, sin el enlace "Remates" (el logo lleva al mismo lugar)
+   y sin "Cerrar sesión" (está al final de la página Perfil) */
+@media (max-width: 760px) {
   .app-header {
-    padding: 12px 16px;
+    min-height: 54px;
+    padding: 0 12px;
+  }
+
+  .app-logo {
+    gap: 6px;
+    font-size: 16px;
+  }
+
+  .app-logo svg {
+    width: 24px;
+    height: 24px;
   }
 
   .app-header-actions {
-    gap: 12px;
+    gap: 0;
   }
-}
-/* Paso 74: en celular "Cerrar sesión" sale del encabezado (no cabe junto a Admin, Alertas y Perfil).
-   El botón queda al final de la página Perfil. */
-@media (max-width: 640px) {
+
+  .app-nav-link {
+    padding: 8px 6px;
+    font-size: 14px;
+  }
+
+  .app-nav-inicio,
   .app-logout-btn {
     display: none;
   }
 }
+
+/* Celulares angostos: con el menú a la vista, del logo queda solo el semáforo */
+@media (max-width: 400px) {
+  .app-header.is-con-menu .app-logo-nombre {
+    display: none;
+  }
+}
+
 /* Paso 80: aviso a página completa (al administrador que todavía no activa la verificación en dos pasos) */
 .app-aviso {
   max-width: 480px;

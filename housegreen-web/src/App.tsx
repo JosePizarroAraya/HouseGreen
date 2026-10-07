@@ -1,4 +1,4 @@
-import { Routes, Route, Link } from "react-router-dom";
+import { Routes, Route, Link, NavLink, useLocation } from "react-router-dom";
 import { PropertiesPage } from "./pages/PropertiesPage";
 import { PropertyDetailPage } from "./pages/PropertyDetailPage";
 import { LoginPage } from "./pages/LoginPage";
@@ -22,6 +22,11 @@ import { PerfilPage } from "./pages/PerfilPage";
 import { OpinionesPage } from "./pages/OpinionesPage";
 
 
+// Clases de un enlace del menú: el de la sección actual queda marcado
+function claseDelEnlace({ isActive }: { isActive: boolean }) {
+  return `app-nav-link ${isActive ? "is-activo" : ""}`;
+}
+
 function App() {
   const { estaLogueado, esAdmin, cerrarSesion } = useAuth();
   const { noLeidas } = useAlerts();
@@ -29,36 +34,52 @@ function App() {
   // Paso 90: el número rojo junto a "Alertas" suma las notificaciones y los anuncios sin leer
   const pendientes = noLeidas + sinLeer;
 
+  // "Remates" queda marcado en el catálogo y también dentro del detalle de una propiedad
+  const { pathname } = useLocation();
+  const enRemates = pathname === "/" || pathname.startsWith("/propiedades");
+
   return (
     <div>
-      <header className="app-header">
+      <header className={`app-header ${estaLogueado ? "is-con-menu" : ""}`}>
         <Link to="/" className="app-logo">
-          HouseGreen
+          {/* El mismo dibujo del ícono de la pestaña (public/favicon.svg) */}
+          <svg viewBox="0 0 64 64" aria-hidden="true">
+            <rect width="64" height="64" rx="14" fill="#0f3d30" />
+            <circle cx="32" cy="15" r="7.5" fill="#ef4444" />
+            <circle cx="32" cy="32" r="7.5" fill="#facc15" />
+            <circle cx="32" cy="49" r="7.5" fill="#22c55e" />
+          </svg>
+          <span className="app-logo-nombre">HouseGreen</span>
         </Link>
 
         {estaLogueado && (
-          <div className="app-header-actions">
-            {esAdmin && (
-              <Link to="/admin" className="app-alerts-link">
-                Admin
-              </Link>
-            )}
-            <Link to="/alertas" className="app-alerts-link">
-              Alertas {pendientes > 0 && <span className="app-alerts-badge">{pendientes}</span>}
+          <nav className="app-header-actions" aria-label="Menú principal">
+            <Link to="/" className={`app-nav-link app-nav-inicio ${enRemates ? "is-activo" : ""}`}>
+              Remates
             </Link>
+            {esAdmin && (
+              <NavLink to="/admin" className={claseDelEnlace}>
+                Admin
+              </NavLink>
+            )}
+            <NavLink to="/alertas" className={claseDelEnlace}>
+              Alertas{" "}
+              {/* Con más de 9 se muestra "9+", para que el número no ensanche el menú */}
+              {pendientes > 0 && <span className="app-alerts-badge">{pendientes > 9 ? "9+" : pendientes}</span>}
+            </NavLink>
             {/* Paso 82: el administrador ve las opiniones en su panel; el resto las envía desde aquí */}
             {!esAdmin && (
-              <Link to="/opiniones" className="app-alerts-link">
+              <NavLink to="/opiniones" className={claseDelEnlace}>
                 Opinar
-              </Link>
+              </NavLink>
             )}
-            <Link to="/perfil" className="app-alerts-link">
+            <NavLink to="/perfil" className={claseDelEnlace}>
               Perfil
-            </Link>
+            </NavLink>
             <button onClick={cerrarSesion} className="app-logout-btn">
               Cerrar sesión
             </button>
-          </div>
+          </nav>
         )}
       </header>
 

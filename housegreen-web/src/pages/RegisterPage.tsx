@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { api } from "../api/client";
 import { problemaDeContrasena, REGLA_CONTRASENA } from "../utils/contrasena";
+import { MarcoDeEntrada } from "../components/MarcoDeEntrada";
 import "./LoginPage.css"; // reutilizamos los mismos estilos del login
 
 export function RegisterPage() {
@@ -61,12 +62,16 @@ export function RegisterPage() {
   }
 
   return (
-    <div className="login-page">
+    <MarcoDeEntrada>
       <form className="login-form" onSubmit={handleSubmit}>
         <h1>Crear cuenta</h1>
-        <p className="login-subtitle">Regístrate para acceder a HouseGreen</p>
+        <p className="login-subtitle">Regístrate para ver los remates y guardar tus favoritos.</p>
 
-        {error && <p className="login-error">{error}</p>}
+        {error && (
+          <p className="login-error" role="alert">
+            {error}
+          </p>
+        )}
 
         <label className="login-label">
           Nombre completo
@@ -139,6 +144,6 @@ export function RegisterPage() {
           ¿Ya tienes cuenta? <Link to="/login">Inicia sesión</Link>
         </p>
       </form>
-    </div>
+    </MarcoDeEntrada>
   );
 }

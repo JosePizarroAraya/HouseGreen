@@ -1,81 +1,113 @@
-.login-page {
-  min-height: calc(100vh - 65px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
-}
+/* Formularios de entrada: iniciar sesión, código de dos pasos y crear cuenta.
+   El marco (panel verde + columna del formulario) está en components/MarcoDeEntrada.css */
 
 .login-form {
   width: 100%;
-  max-width: 360px;
-  background-color: white;
-  border: 1px solid #e5e5e4;
-  border-radius: 12px;
-  padding: 28px;
+  max-width: 380px;
 }
 
 .login-form h1 {
   margin: 0;
-  font-size: 22px;
+  color: #0f3d30;
+  font-size: 30px;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
 }
 
 .login-subtitle {
-  color: #737373;
-  font-size: 14px;
-  margin: 6px 0 20px;
+  margin: 8px 0 28px;
+  color: #5f6b66;
+  font-size: 16px;
+  line-height: 1.45;
 }
 
 .login-error {
-  background-color: #fee2e2;
+  margin: 0 0 20px;
+  padding: 10px 14px;
+  border-left: 4px solid #dc2626;
+  border-radius: 6px;
+  background-color: #fef2f2;
   color: #991b1b;
-  padding: 8px 12px;
-  border-radius: 8px;
-  font-size: 13px;
-  margin-bottom: 16px;
+  font-size: 14px;
+  line-height: 1.4;
 }
 
 .login-label {
   display: block;
-  font-size: 13px;
+  margin-bottom: 18px;
+  color: #2f3a35;
+  font-size: 14px;
   font-weight: 600;
-  margin-bottom: 14px;
-  color: #404040;
 }
 
 .login-input {
   display: block;
   width: 100%;
   margin-top: 6px;
-  padding: 10px 12px;
-  border: 1px solid #d4d4d4;
-  border-radius: 8px;
-  font-size: 14px;
+  padding: 12px 14px;
+  border: 1px solid #c9d1cd;
+  border-radius: 10px;
   box-sizing: border-box;
+  background-color: white;
+  color: #1c1c1c;
+  font-family: inherit;
+  font-size: 16px; /* con menos de 16px el iPhone acerca la pantalla al escribir */
+  font-weight: 400;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.login-input::placeholder {
+  color: #9aa5a0;
+}
+
+.login-input:hover {
+  border-color: #9aa5a0;
+}
+
+.login-input:focus {
+  outline: none;
+  border-color: #15803d;
+  box-shadow: 0 0 0 3px rgba(21, 128, 61, 0.2);
 }
 
 .login-button {
   width: 100%;
-  padding: 11px;
+  margin-top: 6px;
+  padding: 13px;
+  border: none;
+  border-radius: 10px;
   background-color: #15803d;
   color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 14px;
+  font-family: inherit;
+  font-size: 16px;
   font-weight: 600;
   cursor: pointer;
-  margin-top: 6px;
+  transition: background-color 0.15s;
 }
 
 .login-button:hover {
-  background-color: #166534;
+  background-color: #0f3d30;
+}
+
+.login-button:focus-visible,
+.login-volver:focus-visible,
+.login-switch a:focus-visible {
+  outline: 3px solid rgba(21, 128, 61, 0.45);
+  outline-offset: 2px;
+}
+
+.login-button:disabled {
+  background-color: #9aa5a0;
+  cursor: not-allowed;
 }
 
 .login-switch {
-  margin-top: 16px;
+  margin: 22px 0 0;
+  padding-top: 20px;
+  border-top: 1px solid #e4e8e6;
+  color: #5f6b66;
+  font-size: 15px;
   text-align: center;
-  font-size: 13px;
-  color: #737373;
 }
 
 .login-switch a {
@@ -87,28 +119,38 @@
 .login-switch a:hover {
   text-decoration: underline;
 }
-/* Paso 75: texto de ayuda debajo de un campo (reglas de la contraseña en el registro) */
+
+/* Texto de ayuda debajo de un campo (reglas de la contraseña en el registro) */
 .login-ayuda {
   display: block;
   margin-top: 6px;
-  color: #737373;
-  font-size: 12px;
+  color: #5f6b66;
+  font-size: 13px;
   font-weight: 400;
+  line-height: 1.4;
 }
 
-/* Paso 75: casilla para ver las contraseñas mientras se escriben */
+/* Casilla para ver las contraseñas mientras se escriben */
 .login-mostrar {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-bottom: 14px;
-  color: #404040;
-  font-size: 13px;
+  margin-bottom: 20px;
+  color: #2f3a35;
+  font-size: 14px;
   cursor: pointer;
 }
-/* Paso 78: segundo paso del inicio de sesión (código de la aplicación) */
+
+.login-mostrar input {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  accent-color: #15803d;
+}
+
+/* Segundo paso del inicio de sesión (código de la aplicación) */
 .login-codigo {
-  font-size: 22px;
+  font-size: 24px;
   letter-spacing: 0.2em;
   text-align: center;
 }
@@ -119,7 +161,7 @@
   background: none;
   color: #15803d;
   font-family: inherit;
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 600;
   cursor: pointer;
 }
