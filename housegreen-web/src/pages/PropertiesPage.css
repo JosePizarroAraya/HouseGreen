@@ -246,3 +246,14 @@
 .cat-boton-mas:hover {
   background-color: #dcfce7;
 }
+
+/* Paso 72: cuántos remates tiene cada tipo de propiedad */
+.cat-chip-cantidad {
+  color: #737373;
+  font-size: 13px;
+  font-weight: 400;
+}
+
+.cat-chip.is-activo .cat-chip-cantidad {
+  color: #166534;
+}

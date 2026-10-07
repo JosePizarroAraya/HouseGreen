@@ -13,6 +13,8 @@ export interface UsuarioActual {
   role_id: number;
   phone: string | null;
   role_name: string | null;
+  two_fa_enabled: boolean; // paso 76: si tiene activada la verificación en dos pasos
+  two_fa_required: boolean;
 }
 
 interface AuthContextType {
@@ -21,8 +23,11 @@ interface AuthContextType {
   esAdmin: boolean;
   verificandoSesion: boolean; // true mientras se revisa un token guardado al abrir la página
   cargando: boolean;
-  iniciarSesion: (email: string, password: string) => Promise<void>;
+  // Paso 78: devuelve true si entró, o false si la cuenta tiene verificación en dos pasos
+  // y todavía falta el código (hay que volver a llamar con el código)
+  iniciarSesion: (email: string, password: string, codigo?: string) => Promise<boolean>;
   cerrarSesion: () => void;
+  actualizarUsuario: (datos: UsuarioActual) => void; // paso 74: después de editar el perfil
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -43,15 +48,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .finally(() => setVerificandoSesion(false));
   }, []);
 
-  async function iniciarSesion(email: string, password: string) {
+  async function iniciarSesion(email: string, password: string, codigo?: string) {
     setCargando(true);
     try {
       // 1. POST /auth/login entrega el token
-      const respuesta = await api.post("/auth/login", { email, password });
+      const respuesta = await api.post("/auth/login", { email, password, code: codigo ?? null });
+      // Paso 78: la contraseña está bien, pero la cuenta pide el código de la aplicación
+      if (respuesta.requires_2fa) return false;
       guardarToken(respuesta.access_token);
       // 2. GET /auth/me dice quién es y qué rol tiene
       const datos: UsuarioActual = await api.get("/auth/me");
       setUsuario(datos);
+      return true;
     } catch (err) {
       borrarToken();
       throw err; // LoginPage muestra el mensaje de error
@@ -75,6 +83,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         cargando,
         iniciarSesion,
         cerrarSesion,
+        actualizarUsuario: setUsuario,
       }}
     >
       {children}

@@ -1,0 +1,199 @@
+/* Paso 85: "Usuarios" del administrador (paleta "Menta sereno") */
+
+.usu-volver {
+  display: inline-block;
+  margin-bottom: 8px;
+  color: #1d6f55;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.usu-volver:hover {
+  text-decoration: underline;
+}
+
+.usu-error {
+  margin-top: 16px;
+  padding: 12px 16px;
+  border-radius: 14px;
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+/* Filtros: el buscador ocupa el doble que los dos selectores */
+.usu-filtros {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.usu-filtros label {
+  flex: 1;
+  min-width: 160px;
+  color: #4e625b;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.usu-filtros .usu-buscar {
+  flex: 2;
+  min-width: 220px;
+}
+
+.usu-filtros input,
+.usu-filtros select {
+  display: block;
+  width: 100%;
+  margin-top: 4px;
+  padding: 9px 10px;
+  border: 1px solid #c9d8d1;
+  border-radius: 10px;
+  box-sizing: border-box;
+  background-color: white;
+  color: #0f3d30;
+  font-family: inherit;
+  font-size: 14px;
+}
+
+.usu-volver:focus-visible,
+.usu-filtros input:focus-visible,
+.usu-filtros select:focus-visible,
+.usu-mas button:focus-visible {
+  outline: 2px solid #1d6f55;
+  outline-offset: 2px;
+}
+
+.usu-cuenta {
+  margin: 12px 0 0;
+  color: #4e625b;
+  font-size: 13px;
+}
+
+.usu-vacio {
+  margin-top: 12px;
+  padding: 24px;
+  border: 1px dashed #9ad3bb;
+  border-radius: 14px;
+  background-color: white;
+  color: #4e625b;
+  text-align: center;
+}
+
+.usu-lista {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.usu-item {
+  padding: 14px 16px;
+  border: 1px solid #dce6e1;
+  border-radius: 16px;
+  background-color: white;
+}
+
+/* Nombre y correo a la izquierda, etiquetas a la derecha */
+.usu-cabecera {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+}
+
+.usu-persona {
+  min-width: 0;
+}
+
+.usu-persona h2 {
+  margin: 0;
+  color: #0f3d30;
+  font-size: 16px;
+  overflow-wrap: anywhere;
+}
+
+.usu-persona p {
+  margin: 2px 0 0;
+  color: #4e625b;
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+.usu-etiquetas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.usu-etiqueta {
+  padding: 3px 10px;
+  border-radius: 999px;
+  background-color: #e4ece8;
+  color: #0f3d30;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.usu-etiqueta.is-dos-pasos {
+  background-color: #e4f3ec;
+  color: #1d6f55;
+}
+
+.usu-etiqueta.is-deshabilitada {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+/* Las tres cifras de la persona */
+.usu-cifras {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: 12px 0 0;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background-color: #f2f6f4;
+}
+
+.usu-cifras dt {
+  color: #4e625b;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.usu-cifras dd {
+  margin: 0;
+  color: #0f3d30;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.usu-fechas {
+  margin: 10px 0 0;
+  color: #4e625b;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.usu-mas {
+  margin-top: 16px;
+  text-align: center;
+}
+
+.usu-mas button {
+  padding: 9px 14px;
+  border: 1px solid #c9d8d1;
+  border-radius: 10px;
+  background-color: white;
+  color: #4e625b;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}

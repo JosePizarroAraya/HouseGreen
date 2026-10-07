@@ -32,3 +32,6 @@ cloudinary==1.46.2
 
 # Zonas horarias (Windows no las trae)
 tzdata==2026.5
+
+cryptography==50.0.2
+PyOTP==2.10.0

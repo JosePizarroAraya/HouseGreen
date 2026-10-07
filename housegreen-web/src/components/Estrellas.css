@@ -1,0 +1,12 @@
+/* Paso 82: estrellas de una calificación */
+.estrellas {
+  display: inline-flex;
+  gap: 1px;
+  color: #d4d4d4; /* estrella vacía */
+  font-size: 16px;
+  line-height: 1;
+}
+
+.estrellas .is-llena {
+  color: #f59e0b;
+}

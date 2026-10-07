@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { api } from "../api/client";
+import { problemaDeContrasena, REGLA_CONTRASENA } from "../utils/contrasena";
 import "./LoginPage.css"; // reutilizamos los mismos estilos del login
 
 export function RegisterPage() {
@@ -10,6 +11,7 @@ export function RegisterPage() {
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [mostrar, setMostrar] = useState(false); // paso 75: ver la contraseña mientras se escribe
   const [error, setError] = useState("");
   const [guardando, setGuardando] = useState(false);
 
@@ -25,13 +27,15 @@ export function RegisterPage() {
       return;
     }
 
-    if (password !== confirmPassword) {
-      setError("Las contraseñas no coinciden.");
+    // Paso 75: las mismas reglas de contraseña que el Perfil y la API (src/utils/contrasena.ts)
+    const problema = problemaDeContrasena(password);
+    if (problema) {
+      setError(problema);
       return;
     }
 
-    if (password.length < 6) {
-      setError("La contraseña debe tener al menos 6 caracteres.");
+    if (password !== confirmPassword) {
+      setError("Las contraseñas no coinciden.");
       return;
     }
 
@@ -100,23 +104,31 @@ export function RegisterPage() {
         <label className="login-label">
           Contraseña
           <input
-            type="password"
+            type={mostrar ? "text" : "password"}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             className="login-input"
-            placeholder="Mínimo 6 caracteres"
+            placeholder="Mínimo 8 caracteres"
+            autoComplete="new-password"
           />
+          <span className="login-ayuda">{REGLA_CONTRASENA}</span>
         </label>
 
         <label className="login-label">
           Confirmar contraseña
           <input
-            type="password"
+            type={mostrar ? "text" : "password"}
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             className="login-input"
             placeholder="••••••••"
+            autoComplete="new-password"
           />
+        </label>
+
+        <label className="login-mostrar">
+          <input type="checkbox" checked={mostrar} onChange={(e) => setMostrar(e.target.checked)} />
+          Mostrar las contraseñas
         </label>
 
         <button type="submit" className="login-button" disabled={guardando}>

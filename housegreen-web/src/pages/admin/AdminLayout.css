@@ -98,3 +98,16 @@
     background-color: #e4f3ec;
   }
 }
+
+/* Paso 84: en celulares angostos (menos de 380 px) las cinco secciones no cabían: letra más chica */
+@media (max-width: 380px) {
+  .admin-nav {
+    padding-left: 2px;
+    padding-right: 2px;
+  }
+
+  .admin-nav-link {
+    padding: 10px 1px;
+    font-size: 11px;
+  }
+}

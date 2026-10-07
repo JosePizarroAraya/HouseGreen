@@ -200,7 +200,7 @@ export function PropertyDetailPage() {
       {/* Galería (paso 29): todas las fotos que subió el admin; si no hay, la imagen de siempre.
           key hace que se reinicie al cambiar de propiedad */}
         <GaleriaFotos
-        key={property.id}
+        key={`galeria-${property.id}`}
         propertyId={property.id}
         imagenRespaldo={property.image_url}
         titulo={property.title}
@@ -244,8 +244,7 @@ export function PropertyDetailPage() {
 
       <TarjetaSemaforo evaluacion={property.evaluation} />
       
-      {/* Paso 66: tribunal, rol, modalidad, garantía y anuncio. key hace que se reinicie al cambiar de propiedad */}
-      <DatosRemate key={property.id} propertyId={property.id} />
+      <DatosRemate key={`remate-${property.id}`} propertyId={property.id} />
 
             {/* Paso 54: lo que conviene revisar en los sitios oficiales antes del remate */}
       <div className="detail-seccion">

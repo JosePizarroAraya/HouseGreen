@@ -3,6 +3,8 @@ import { useProperties } from "../context/PropertiesContext";
 import { PropertyCard } from "../components/PropertyCard";
 import { useFavorites } from "../context/FavoritesContext";
 import { remateFinalizado, remateRetirado } from "../components/estadoRemate";
+import { CATEGORIAS, categoriaDeTipo } from "../components/tipoPropiedad";
+import type { CategoriaTipo } from "../components/tipoPropiedad";
 import "./PropertiesPage.css";
 
 type Riesgo = "verde" | "amarillo" | "rojo";
@@ -36,11 +38,6 @@ function normalizar(texto: string) {
   return texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 }
 
-// "casa" -> "Casa"
-function capitalizar(texto: string) {
-  return texto.charAt(0).toUpperCase() + texto.slice(1);
-}
-
 // Lee lo que se escribe en Desde/Hasta: "$40.000.000" -> 40000000 (vacío = sin límite)
 function leerPesos(texto: string): number | null {
   const digitos = texto.replace(/\D/g, "");
@@ -66,7 +63,7 @@ export function PropertiesPage() {
   const [precioDesde, setPrecioDesde] = useState<number | null>(null);
   const [precioHasta, setPrecioHasta] = useState<number | null>(null);
   const [comunasElegidas, setComunasElegidas] = useState<string[]>([]); // vacío = todas
-  const [tiposElegidos, setTiposElegidos] = useState<string[]>([]); // vacío = todos
+  const [tiposElegidos, setTiposElegidos] = useState<CategoriaTipo[]>([]); // vacío = todos
   const [riesgosElegidos, setRiesgosElegidos] = useState<Riesgo[]>([]); // vacío = todos
 
   const { esFavorito } = useFavorites();
@@ -78,7 +75,7 @@ export function PropertiesPage() {
     recargar();
   }, [recargar]);
 
-  // Comunas y tipos que aparecen en los remates, sin repetir y de la A a la Z
+  // Comunas que aparecen en los remates, sin repetir y de la A a la Z
   const comunas = useMemo(
     () =>
       [...new Set(properties.map((p) => comunasPorId[p.comuna_id]).filter(Boolean))].sort((a, b) =>
@@ -86,9 +83,21 @@ export function PropertiesPage() {
       ),
     [properties, comunasPorId]
   );
-  const tipos = useMemo(
-    () => [...new Set(properties.map((p) => p.property_type.toLowerCase()))].sort((a, b) => a.localeCompare(b, "es")),
-    [properties]
+
+  // Paso 72: el sitio de remates usa más de 20 nombres de tipo; el filtro los agrupa en 8 categorías.
+  // Aquí se cuenta cuántos remates vigentes hay en cada una, para mostrar el número en el botón
+  const cantidadPorCategoria = useMemo(() => {
+    const cantidades: Partial<Record<CategoriaTipo, number>> = {};
+    for (const p of properties) {
+      if (remateFinalizado(p.auction_date) || remateRetirado(p.status)) continue;
+      const categoria = categoriaDeTipo(p.property_type);
+      cantidades[categoria] = (cantidades[categoria] ?? 0) + 1;
+    }
+    return cantidades;
+  }, [properties]);
+  // Solo se ofrecen las categorías que tienen remates (o las que ya están elegidas)
+  const categorias = CATEGORIAS.filter(
+    (c) => (cantidadPorCategoria[c.valor] ?? 0) > 0 || tiposElegidos.includes(c.valor)
   );
 
   const propiedadesFiltradas = useMemo(() => {
@@ -99,7 +108,7 @@ export function PropertiesPage() {
       // Si no tiene evaluación se trata como riesgo medio (igual que la tarjeta)
       const riesgo = p.evaluation?.result_level ?? "amarillo";
 
-        const coincideTexto =
+      const coincideTexto =
         normalizar(p.title).includes(texto) ||
         normalizar(nombreComuna).includes(texto) ||
         normalizar(p.address ?? "").includes(texto);
@@ -113,7 +122,7 @@ export function PropertiesPage() {
         (precioDesde === null || precio >= precioDesde) &&
         (precioHasta === null || precio <= precioHasta) &&
         (comunasElegidas.length === 0 || comunasElegidas.includes(nombreComuna)) &&
-        (tiposElegidos.length === 0 || tiposElegidos.includes(p.property_type.toLowerCase())) &&
+        (tiposElegidos.length === 0 || tiposElegidos.includes(categoriaDeTipo(p.property_type))) &&
         (riesgosElegidos.length === 0 || riesgosElegidos.includes(riesgo))
       );
     });
@@ -158,11 +167,11 @@ export function PropertiesPage() {
     tiposElegidos,
     riesgosElegidos,
   ]);
-  
   const [tanda, setTanda] = useState({ firma, cantidad: POR_TANDA });
   const cantidadVisible = tanda.firma === firma ? tanda.cantidad : POR_TANDA;
   const propiedadesVisibles = propiedadesFiltradas.slice(0, cantidadVisible);
   const faltan = propiedadesFiltradas.length - propiedadesVisibles.length;
+
   const filtrosActivos =
     comunasElegidas.length +
     tiposElegidos.length +
@@ -304,18 +313,19 @@ export function PropertiesPage() {
           <fieldset className="cat-grupo">
             <legend>Tipo de propiedad</legend>
             <div className="cat-chips">
-              {tipos.map((t) => {
-                const activo = tiposElegidos.includes(t);
+              {categorias.map((c) => {
+                const activo = tiposElegidos.includes(c.valor);
                 return (
                   <button
-                    key={t}
+                    key={c.valor}
                     type="button"
                     className={`cat-chip ${activo ? "is-activo" : ""}`}
                     aria-pressed={activo}
-                    onClick={() => setTiposElegidos(alternar(tiposElegidos, t))}
+                    onClick={() => setTiposElegidos(alternar(tiposElegidos, c.valor))}
                   >
                     {activo && "✓ "}
-                    {capitalizar(t)}
+                    {c.nombre}
+                    <span className="cat-chip-cantidad">{cantidadPorCategoria[c.valor] ?? 0}</span>
                   </button>
                 );
               })}
@@ -354,7 +364,7 @@ export function PropertiesPage() {
         </div>
       )}
 
-            <div className="properties-grid">
+      <div className="properties-grid">
         {propiedadesVisibles.map((property) => (
           <PropertyCard key={property.id} property={property} />
         ))}

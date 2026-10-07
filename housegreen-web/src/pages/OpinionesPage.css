@@ -1,0 +1,271 @@
+/* Paso 82: página "Tu opinión" */
+.opi-page {
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 32px 16px 48px;
+}
+
+.opi-page h1 {
+  margin: 0;
+}
+
+.opi-subtitulo {
+  margin: 4px 0 0;
+  color: #737373;
+}
+
+.opi-tarjeta {
+  margin-top: 20px;
+  padding: 20px;
+  border: 1px solid #e5e5e4;
+  border-radius: 12px;
+  background-color: white;
+}
+
+.opi-grupo {
+  margin: 0 0 14px;
+  padding: 0;
+  border: none;
+}
+
+.opi-grupo legend,
+.opi-campo {
+  color: #404040;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.opi-grupo legend {
+  padding: 0;
+  margin-bottom: 6px;
+}
+
+/* Las 5 estrellas para elegir: botones grandes, fáciles de tocar en el celular */
+.opi-estrellas {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 2px;
+}
+
+.opi-estrellas button {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: none;
+  border-radius: 8px;
+  background: none;
+  color: #d4d4d4; /* estrella vacía */
+  font-size: 32px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.opi-estrellas button.is-llena {
+  color: #f59e0b;
+}
+
+.opi-estrellas button:hover {
+  background-color: #f5f5f4;
+}
+
+.opi-estrellas button:focus-visible,
+.opi-campo select:focus-visible,
+.opi-campo textarea:focus-visible,
+.opi-boton:focus-visible {
+  outline: 2px solid #15803d;
+  outline-offset: 2px;
+}
+
+.opi-estrellas-texto {
+  margin-left: 8px;
+  color: #404040;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.opi-campo {
+  display: block;
+  margin-bottom: 14px;
+}
+
+.opi-campo select,
+.opi-campo textarea {
+  display: block;
+  width: 100%;
+  margin-top: 6px;
+  padding: 10px 12px;
+  border: 1px solid #d4d4d4;
+  border-radius: 8px;
+  box-sizing: border-box;
+  background-color: white;
+  color: #171717;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 400;
+}
+
+.opi-campo textarea {
+  resize: vertical;
+  line-height: 1.4;
+}
+
+.opi-contador {
+  display: block;
+  margin-top: 4px;
+  color: #737373;
+  font-size: 12px;
+  font-weight: 400;
+  text-align: right;
+}
+
+.opi-casilla {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  color: #404040;
+  font-size: 14px;
+  line-height: 1.4;
+  cursor: pointer;
+}
+
+.opi-casilla input {
+  margin-top: 3px;
+}
+
+.opi-aviso {
+  margin: 14px 0 0;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.opi-aviso.is-ok {
+  background-color: #dcfce7;
+  color: #166534;
+}
+
+.opi-aviso.is-error {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+.opi-boton {
+  margin-top: 16px;
+  padding: 11px 18px;
+  border: none;
+  border-radius: 8px;
+  background-color: #15803d;
+  color: white;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.opi-boton:hover {
+  background-color: #166534;
+}
+
+.opi-boton:disabled {
+  background-color: #e5e5e4;
+  color: #737373;
+  cursor: not-allowed;
+}
+
+/* Lista de opiniones enviadas */
+.opi-titulo-lista {
+  margin: 32px 0 0;
+  font-size: 18px;
+}
+
+.opi-vacio {
+  margin: 10px 0 0;
+  color: #737373;
+  font-size: 14px;
+}
+
+.opi-lista {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.opi-item {
+  padding: 14px 16px;
+  border: 1px solid #e5e5e4;
+  border-radius: 12px;
+  background-color: white;
+}
+
+.opi-item-arriba {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+}
+
+.opi-item-tema {
+  color: #171717;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.opi-item-fecha {
+  margin-left: auto;
+  color: #737373;
+  font-size: 13px;
+}
+
+.opi-item-mensaje {
+  margin: 8px 0 0;
+  color: #262626;
+  font-size: 15px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap; /* respeta los saltos de línea que escribió la persona */
+}
+
+.opi-item-mensaje.is-vacio,
+.opi-item-nota {
+  color: #737373;
+  font-size: 13px;
+}
+
+.opi-item-nota {
+  margin: 8px 0 0;
+}
+
+.opi-respuesta {
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-left: 3px solid #15803d;
+  border-radius: 0 8px 8px 0;
+  background-color: #f0fdf4;
+  color: #262626;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.opi-respuesta p {
+  margin: 0;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.opi-respuesta .opi-respuesta-titulo {
+  margin-bottom: 2px;
+  color: #166534;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+@media (max-width: 480px) {
+  .opi-boton {
+    width: 100%;
+  }
+}

@@ -1,0 +1,277 @@
+/* Paso 84: Panel del administrador (paleta "Menta sereno") */
+
+.panel-error {
+  margin-top: 16px;
+  padding: 12px 16px;
+  border-radius: 14px;
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+/* Las cuatro cifras: 4 columnas en PC, 2 en celular */
+.panel-cifras {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.panel-cifra,
+.panel-tarjeta {
+  border: 1px solid #dce6e1;
+  border-radius: 16px;
+  background-color: white;
+}
+
+.panel-cifra {
+  padding: 14px 16px;
+}
+
+.panel-cifra-titulo {
+  margin: 0;
+  color: #4e625b;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.panel-cifra-valor {
+  margin: 4px 0 0;
+  color: #0f3d30;
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.panel-cifra-nota {
+  margin: 4px 0 0;
+  color: #4e625b;
+  font-size: 12px;
+  line-height: 1.3;
+}
+
+.panel-tarjeta {
+  margin-top: 12px;
+  padding: 16px 20px;
+}
+
+.panel-tarjeta h2 {
+  margin: 0 0 12px;
+  color: #0f3d30;
+  font-size: 17px;
+}
+
+.panel-vacio {
+  margin: 0;
+  color: #4e625b;
+  font-size: 14px;
+}
+
+.panel-tarjeta a {
+  color: #1d6f55;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.panel-tarjeta a:hover {
+  text-decoration: underline;
+}
+
+.panel-tarjeta a:focus-visible {
+  outline: 2px solid #1d6f55;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Pendientes */
+.panel-pendientes {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.panel-pendientes li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  padding: 10px 0;
+  color: #1f2a26;
+  font-size: 15px;
+}
+
+.panel-pendientes li + li {
+  border-top: 1px solid #e4ece8;
+}
+
+.panel-pendientes a {
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+/* Barra del semáforo: cada parte crece según su cantidad; 2 px de separación entre partes */
+.panel-barra {
+  display: flex;
+  gap: 2px;
+  height: 16px;
+}
+
+.panel-barra-parte {
+  min-width: 6px; /* para que una parte muy chica igual se vea */
+}
+
+.panel-barra-parte:first-child {
+  border-radius: 4px 0 0 4px;
+}
+
+.panel-barra-parte:last-child {
+  border-radius: 0 4px 4px 0;
+}
+
+.panel-barra-parte:only-child {
+  border-radius: 4px;
+}
+
+/* Los mismos colores del semáforo que ve el inversionista */
+.panel-barra-parte.is-verde,
+.panel-leyenda-color.is-verde {
+  background-color: #16a34a;
+}
+
+.panel-barra-parte.is-amarillo,
+.panel-leyenda-color.is-amarillo {
+  background-color: #facc15;
+}
+
+.panel-barra-parte.is-rojo,
+.panel-leyenda-color.is-rojo {
+  background-color: #dc2626;
+}
+
+.panel-barra-parte.is-sin_evaluar,
+.panel-leyenda-color.is-sin_evaluar {
+  background-color: #a3a3a3;
+}
+
+.panel-leyenda {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 6px 16px;
+}
+
+.panel-leyenda li {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  color: #1f2a26;
+  font-size: 14px;
+}
+
+.panel-leyenda-color {
+  flex-shrink: 0;
+  align-self: center;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.panel-leyenda-nombre {
+  color: #4e625b;
+}
+
+.panel-leyenda-porcentaje {
+  color: #4e625b;
+  font-size: 13px;
+}
+
+/* Más vistas */
+.panel-mas-vistas {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.panel-mas-vistas li {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+}
+
+.panel-mas-vistas li + li {
+  border-top: 1px solid #e4ece8;
+}
+
+.panel-puesto {
+  color: #4e625b;
+  font-size: 14px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.panel-mas-vistas-info {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.panel-mas-vistas-info a {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.panel-mas-vistas-comuna,
+.panel-mas-vistas-guardados {
+  color: #4e625b;
+  font-size: 13px;
+}
+
+.panel-mas-vistas-cifras {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  color: #1f2a26;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.panel-enlace-final {
+  margin: 12px 0 0;
+  font-size: 14px;
+}
+
+@media (max-width: 720px) {
+  .panel-cifras {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .panel-cifra-valor {
+    font-size: 28px;
+  }
+}
+/* Paso 85: enlace a Usuarios, debajo de las cifras */
+.panel-accesos {
+  margin: 12px 0 0;
+  font-size: 14px;
+}
+
+.panel-accesos a {
+  color: #1d6f55;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.panel-accesos a:hover {
+  text-decoration: underline;
+}
+
+.panel-accesos a:focus-visible {
+  outline: 2px solid #1d6f55;
+  outline-offset: 2px;
+  border-radius: 4px;
+}

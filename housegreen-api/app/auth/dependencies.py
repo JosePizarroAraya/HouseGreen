@@ -5,10 +5,14 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models.user import User
 from app.auth.security import decode_access_token
+from app.auth.two_factor import es_obligatoria_para
 
 # Esto le dice a FastAPI (y a la página /docs) de dónde espera recibir el token:
 # como un header "Authorization: Bearer <token>" en cada petición.
 oauth2_scheme = HTTPBearer()
+
+# id del rol administrador en la tabla roles
+ROL_ADMIN_ID = 3
 
 def get_current_user(
     token: HTTPAuthorizationCredentials = Depends(oauth2_scheme),
@@ -32,12 +36,25 @@ def get_current_user(
     if usuario is None:
         raise credentials_exception
 
+    # Una cuenta deshabilitada no puede seguir usando un token que obtuvo antes
+    if not usuario.is_active:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Esta cuenta está deshabilitada")
+
     return usuario
 
 def requerir_admin(usuario: User = Depends(get_current_user)) -> User:
-    if usuario.role_id != 3:
+    if usuario.role_id != ROL_ADMIN_ID:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Esta acción requiere permisos de administrador",
         )
+
+    # Paso 80: el administrador está obligado a usar la verificación en dos pasos.
+    # Mientras no la active puede entrar a su Perfil (para activarla), pero no administrar.
+    if es_obligatoria_para(usuario.role_id) and not usuario.two_fa_enabled:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Las cuentas de administrador deben activar la verificación en dos pasos. Actívala en tu Perfil.",
+        )
+
     return usuario

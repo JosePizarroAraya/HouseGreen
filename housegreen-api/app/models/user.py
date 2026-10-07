@@ -22,6 +22,7 @@ class User(Base):
     full_name = Column(String(150), nullable=False)
     phone = Column(String(30))
     two_fa_enabled = Column(Boolean, default=False)
+    two_fa_secret = Column(String(255))
     is_active = Column(Boolean, default=True)
     created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
 

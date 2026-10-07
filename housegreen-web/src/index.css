@@ -88,3 +88,52 @@ body {
     gap: 12px;
   }
 }
+/* Paso 74: en celular "Cerrar sesión" sale del encabezado (no cabe junto a Admin, Alertas y Perfil).
+   El botón queda al final de la página Perfil. */
+@media (max-width: 640px) {
+  .app-logout-btn {
+    display: none;
+  }
+}
+/* Paso 80: aviso a página completa (al administrador que todavía no activa la verificación en dos pasos) */
+.app-aviso {
+  max-width: 480px;
+  margin: 48px auto;
+  padding: 28px 24px;
+  border: 1px solid #e5e5e4;
+  border-radius: 12px;
+  background-color: white;
+  text-align: center;
+}
+
+.app-aviso h1 {
+  margin: 0;
+  font-size: 22px;
+}
+
+.app-aviso p {
+  margin: 10px 0 20px;
+  color: #404040;
+  line-height: 1.5;
+}
+
+.app-aviso-boton {
+  display: inline-block;
+  padding: 11px 18px;
+  border-radius: 8px;
+  background-color: #15803d;
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.app-aviso-boton:hover {
+  background-color: #166534;
+}
+
+@media (max-width: 520px) {
+  .app-aviso {
+    margin: 24px 16px;
+  }
+}

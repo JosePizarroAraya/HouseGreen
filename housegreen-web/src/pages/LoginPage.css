@@ -87,3 +87,43 @@
 .login-switch a:hover {
   text-decoration: underline;
 }
+/* Paso 75: texto de ayuda debajo de un campo (reglas de la contraseña en el registro) */
+.login-ayuda {
+  display: block;
+  margin-top: 6px;
+  color: #737373;
+  font-size: 12px;
+  font-weight: 400;
+}
+
+/* Paso 75: casilla para ver las contraseñas mientras se escriben */
+.login-mostrar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+  color: #404040;
+  font-size: 13px;
+  cursor: pointer;
+}
+/* Paso 78: segundo paso del inicio de sesión (código de la aplicación) */
+.login-codigo {
+  font-size: 22px;
+  letter-spacing: 0.2em;
+  text-align: center;
+}
+
+.login-volver {
+  padding: 0;
+  border: none;
+  background: none;
+  color: #15803d;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.login-volver:hover {
+  text-decoration: underline;
+}

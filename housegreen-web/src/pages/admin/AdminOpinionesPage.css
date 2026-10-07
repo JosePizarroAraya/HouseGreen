@@ -1,0 +1,359 @@
+/* Paso 83: apartado "Opiniones" del administrador (paleta "Menta sereno") */
+
+.opa-error {
+  margin-top: 16px;
+  padding: 12px 16px;
+  border-radius: 14px;
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+.opa-vacio {
+  margin-top: 16px;
+  padding: 24px;
+  border: 1px dashed #9ad3bb;
+  border-radius: 14px;
+  background-color: white;
+  color: #4e625b;
+  text-align: center;
+}
+
+/* Resumen: promedio a la izquierda, barras a la derecha */
+.opa-resumen {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin-top: 16px;
+  padding: 16px 20px;
+  border: 1px solid #dce6e1;
+  border-radius: 16px;
+  background-color: white;
+}
+
+.opa-promedio {
+  flex-shrink: 0;
+  min-width: 110px;
+  text-align: center;
+}
+
+.opa-promedio-numero {
+  margin: 0;
+  color: #0f3d30;
+  font-size: 44px;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.opa-promedio-texto {
+  margin: 4px 0 0;
+  color: #4e625b;
+  font-size: 13px;
+}
+
+.opa-barras {
+  flex: 1;
+  min-width: 0;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.opa-barras li {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr) 28px;
+  align-items: center;
+  gap: 8px;
+  color: #4e625b;
+  font-size: 13px;
+}
+
+.opa-barra-fondo {
+  height: 8px;
+  border-radius: 4px;
+  background-color: #e4ece8;
+  overflow: hidden;
+}
+
+.opa-barra-llena {
+  display: block;
+  height: 100%;
+  border-radius: 4px;
+  background-color: #1d6f55;
+}
+
+.opa-barra-cantidad {
+  color: #0f3d30;
+  font-weight: 700;
+  text-align: right;
+}
+
+/* Pestañas */
+.opa-pestanas {
+  display: flex;
+  gap: 4px;
+  margin-top: 16px;
+  padding: 4px;
+  border-radius: 14px;
+  background-color: #e4ece8;
+}
+
+.opa-pestana {
+  flex: 1;
+  padding: 10px 8px;
+  border: none;
+  border-radius: 10px;
+  background-color: transparent;
+  color: #4e625b;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.opa-pestana.is-activa {
+  background-color: white;
+  color: #0f3d30;
+  box-shadow: 0 1px 2px rgba(15, 61, 48, 0.15);
+}
+
+/* Filtros */
+.opa-filtros {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.opa-filtros label {
+  flex: 1;
+  min-width: 160px;
+  color: #4e625b;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.opa-filtros select {
+  display: block;
+  width: 100%;
+  margin-top: 4px;
+  padding: 9px 10px;
+  border: 1px solid #c9d8d1;
+  border-radius: 10px;
+  background-color: white;
+  color: #0f3d30;
+  font-family: inherit;
+  font-size: 14px;
+}
+
+/* Lista */
+.opa-lista {
+  list-style: none;
+  margin: 16px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.opa-item {
+  padding: 14px 16px;
+  border: 1px solid #dce6e1;
+  border-radius: 16px;
+  background-color: white;
+}
+
+.opa-item-arriba {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+}
+
+.opa-item-tema {
+  color: #0f3d30;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.opa-item-fecha {
+  margin-left: auto;
+  color: #4e625b;
+  font-size: 13px;
+}
+
+.opa-item-persona {
+  margin: 4px 0 0;
+  color: #4e625b;
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+.opa-item-mensaje {
+  margin: 8px 0 0;
+  color: #1f2a26;
+  font-size: 15px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap; /* respeta los saltos de línea que escribió la persona */
+}
+
+.opa-item-mensaje.is-vacio,
+.opa-item-nota {
+  color: #4e625b;
+  font-size: 13px;
+}
+
+.opa-item-nota {
+  margin: 10px 0 0;
+}
+
+.opa-respuesta {
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-left: 3px solid #1d6f55;
+  border-radius: 0 10px 10px 0;
+  background-color: #e4f3ec;
+  color: #1f2a26;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.opa-respuesta p {
+  margin: 0;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.opa-respuesta .opa-respuesta-titulo {
+  margin-bottom: 2px;
+  color: #1d6f55;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* Botones */
+.opa-boton-responder,
+.opa-boton-enviar,
+.opa-boton-cancelar,
+.opa-mas button {
+  padding: 9px 14px;
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.opa-boton-responder {
+  margin-top: 12px;
+  border: 1px solid #1d6f55;
+  background-color: white;
+  color: #1d6f55;
+}
+
+.opa-boton-responder:hover {
+  background-color: #e4f3ec;
+}
+
+.opa-boton-enviar {
+  border: none;
+  background-color: #1d6f55;
+  color: white;
+}
+
+.opa-boton-enviar:hover {
+  background-color: #0f3d30;
+}
+
+.opa-boton-enviar:disabled {
+  background-color: #c9d8d1;
+  color: #4e625b;
+  cursor: not-allowed;
+}
+
+.opa-boton-cancelar,
+.opa-mas button {
+  border: 1px solid #c9d8d1;
+  background-color: white;
+  color: #4e625b;
+}
+
+.opa-pestana:focus-visible,
+.opa-filtros select:focus-visible,
+.opa-formulario textarea:focus-visible,
+.opa-boton-responder:focus-visible,
+.opa-boton-enviar:focus-visible,
+.opa-boton-cancelar:focus-visible,
+.opa-mas button:focus-visible {
+  outline: 2px solid #1d6f55;
+  outline-offset: 2px;
+}
+
+/* Formulario de respuesta */
+.opa-formulario {
+  margin-top: 12px;
+}
+
+.opa-formulario label {
+  display: block;
+  color: #4e625b;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.opa-formulario textarea {
+  display: block;
+  width: 100%;
+  margin-top: 6px;
+  padding: 10px 12px;
+  border: 1px solid #c9d8d1;
+  border-radius: 10px;
+  box-sizing: border-box;
+  color: #1f2a26;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1.4;
+  resize: vertical;
+}
+
+.opa-error-chico {
+  margin: 8px 0 0;
+  color: #991b1b;
+  font-size: 13px;
+}
+
+.opa-formulario-botones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.opa-mas {
+  margin-top: 16px;
+  color: #4e625b;
+  font-size: 14px;
+  text-align: center;
+}
+
+.opa-mas p {
+  margin: 0 0 8px;
+}
+
+/* Celular: el promedio arriba y las barras abajo; pestañas con letra más chica */
+@media (max-width: 560px) {
+  .opa-resumen {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 14px;
+  }
+
+  .opa-pestana {
+    padding: 10px 4px;
+    font-size: 12px;
+  }
+}

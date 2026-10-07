@@ -34,3 +34,23 @@ def decode_access_token(token: str) -> dict | None:
     except jwt.JWTError:
         # Si el token fue manipulado, expiró, o no fue firmado con tu SECRET_KEY, falla acá
         return None
+
+
+
+# Paso 73: reglas de la contraseña, en un solo lugar.
+# Las usan el registro y el cambio de contraseña. Si el equipo cambia las reglas, se cambian aquí.
+LARGO_MINIMO = 8
+LARGO_MAXIMO = 64
+
+def problema_de_contrasena(password: str) -> str | None:
+    """Devuelve el motivo por el que la contraseña no sirve, o None si cumple las reglas."""
+    if len(password) < LARGO_MINIMO:
+        return f"La contraseña debe tener al menos {LARGO_MINIMO} caracteres."
+    # bcrypt solo usa los primeros 72 bytes (una "ñ" o una letra con tilde ocupan 2)
+    if len(password) > LARGO_MAXIMO or len(password.encode("utf-8")) > 72:
+        return f"La contraseña puede tener como máximo {LARGO_MAXIMO} caracteres."
+    if not any(caracter.isalpha() for caracter in password):
+        return "La contraseña debe tener al menos una letra."
+    if not any(caracter.isdigit() for caracter in password):
+        return "La contraseña debe tener al menos un número."
+    return None
