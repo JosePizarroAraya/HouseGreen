@@ -4,6 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import { api } from "../api/client";
 import { problemaDeContrasena, REGLA_CONTRASENA } from "../utils/contrasena";
 import { MarcoDeEntrada } from "../components/MarcoDeEntrada";
+import { CampoDeEntrada } from "../components/CampoDeEntrada";
 import "./LoginPage.css"; // reutilizamos los mismos estilos del login
 
 export function RegisterPage() {
@@ -12,7 +13,7 @@ export function RegisterPage() {
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [mostrar, setMostrar] = useState(false); // paso 75: ver la contraseña mientras se escribe
+  const [mostrar, setMostrar] = useState(false); // el ojo: ver las contraseñas mientras se escriben
   const [error, setError] = useState("");
   const [guardando, setGuardando] = useState(false);
 
@@ -73,68 +74,61 @@ export function RegisterPage() {
           </p>
         )}
 
-        <label className="login-label">
-          Nombre completo
-          <input
-            type="text"
-            value={fullName}
-            onChange={(e) => setFullName(e.target.value)}
-            className="login-input"
-            placeholder="Tu nombre completo"
-          />
-        </label>
+        <CampoDeEntrada
+          etiqueta="Nombre completo"
+          icono="persona"
+          type="text"
+          autoComplete="name"
+          value={fullName}
+          onChange={(e) => setFullName(e.target.value)}
+          placeholder="Tu nombre completo"
+        />
 
-        <label className="login-label">
-          Correo electrónico
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="login-input"
-            placeholder="tucorreo@ejemplo.com"
-          />
-        </label>
+        <CampoDeEntrada
+          etiqueta="Correo electrónico"
+          icono="correo"
+          type="email"
+          autoComplete="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="tucorreo@ejemplo.com"
+        />
 
-        <label className="login-label">
-          Teléfono (opcional)
-          <input
-            type="tel"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            className="login-input"
-            placeholder="+56 9 1234 5678"
-          />
-        </label>
+        <CampoDeEntrada
+          etiqueta="Teléfono (opcional)"
+          icono="telefono"
+          type="tel"
+          autoComplete="tel"
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+          placeholder="+56 9 1234 5678"
+        />
 
-        <label className="login-label">
-          Contraseña
-          <input
-            type={mostrar ? "text" : "password"}
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="login-input"
-            placeholder="Mínimo 8 caracteres"
-            autoComplete="new-password"
-          />
-          <span className="login-ayuda">{REGLA_CONTRASENA}</span>
-        </label>
+        {/* Los dos ojos hacen lo mismo: muestran u ocultan las dos contraseñas a la vez */}
+        <CampoDeEntrada
+          etiqueta="Contraseña"
+          icono="candado"
+          type={mostrar ? "text" : "password"}
+          autoComplete="new-password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          placeholder="Mínimo 8 caracteres"
+          ayuda={REGLA_CONTRASENA}
+          visible={mostrar}
+          alCambiarVisible={() => setMostrar(!mostrar)}
+        />
 
-        <label className="login-label">
-          Confirmar contraseña
-          <input
-            type={mostrar ? "text" : "password"}
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            className="login-input"
-            placeholder="••••••••"
-            autoComplete="new-password"
-          />
-        </label>
-
-        <label className="login-mostrar">
-          <input type="checkbox" checked={mostrar} onChange={(e) => setMostrar(e.target.checked)} />
-          Mostrar las contraseñas
-        </label>
+        <CampoDeEntrada
+          etiqueta="Confirmar contraseña"
+          icono="candado"
+          type={mostrar ? "text" : "password"}
+          autoComplete="new-password"
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+          placeholder="••••••••"
+          visible={mostrar}
+          alCambiarVisible={() => setMostrar(!mostrar)}
+        />
 
         <button type="submit" className="login-button" disabled={guardando}>
           {guardando ? "Creando cuenta..." : "Crear cuenta"}
@@ -142,6 +136,14 @@ export function RegisterPage() {
 
         <p className="login-switch">
           ¿Ya tienes cuenta? <Link to="/login">Inicia sesión</Link>
+        </p>
+
+        <p className="login-nota">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 3 5 6v5.5c0 4.2 2.9 7.6 7 9 4.1-1.4 7-4.8 7-9V6l-7-3Z" />
+            <path d="m9 12 2.2 2.2L15 10.5" />
+          </svg>
+          Después podrás activar la verificación en dos pasos desde tu Perfil.
         </p>
       </form>
     </MarcoDeEntrada>

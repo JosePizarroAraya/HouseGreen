@@ -9,6 +9,12 @@ body {
   color: #1c1c1c;
 }
 
+/* El título principal de cada página va en el verde oscuro de HouseGreen */
+h1 {
+  color: #0f3d30;
+  letter-spacing: -0.01em;
+}
+
 /* ---------- Encabezado: el logo a la izquierda y el menú a la derecha ---------- */
 .app-header {
   display: flex;
@@ -143,45 +149,68 @@ body {
   }
 }
 
-/* Paso 80: aviso a página completa (al administrador que todavía no activa la verificación en dos pasos) */
+/* ---------- Aviso a página completa ----------
+   Lo usan dos pantallas: "Página no encontrada" y el aviso al administrador
+   que todavía no activa la verificación en dos pasos. */
 .app-aviso {
   max-width: 480px;
-  margin: 48px auto;
-  padding: 28px 24px;
-  border: 1px solid #e5e5e4;
-  border-radius: 12px;
+  margin: 56px auto;
+  padding: 36px 32px 32px;
+  border: 1px solid #e1e7e4;
+  border-radius: 20px;
   background-color: white;
+  box-shadow: 0 28px 56px -32px rgba(15, 61, 48, 0.45);
   text-align: center;
+}
+
+/* Dibujo de arriba del aviso (el semáforo en rojo de "Página no encontrada") */
+.app-aviso svg {
+  display: block;
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 18px;
 }
 
 .app-aviso h1 {
   margin: 0;
-  font-size: 22px;
+  font-size: 26px;
+  line-height: 1.2;
 }
 
 .app-aviso p {
-  margin: 10px 0 20px;
-  color: #404040;
+  margin: 10px 0 24px;
+  color: #5f6b66;
   line-height: 1.5;
+  overflow-wrap: anywhere; /* una dirección muy larga se parte en vez de salirse */
+}
+
+.app-aviso p strong {
+  color: #2f3a35;
 }
 
 .app-aviso-boton {
   display: inline-block;
-  padding: 11px 18px;
-  border-radius: 8px;
+  padding: 12px 22px;
+  border-radius: 10px;
   background-color: #15803d;
   color: white;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 600;
   text-decoration: none;
 }
 
 .app-aviso-boton:hover {
-  background-color: #166534;
+  background-color: #0f3d30;
+}
+
+.app-aviso-boton:focus-visible {
+  outline: 3px solid rgba(21, 128, 61, 0.45);
+  outline-offset: 2px;
 }
 
 @media (max-width: 520px) {
   .app-aviso {
     margin: 24px 16px;
+    padding: 28px 20px 24px;
   }
 }

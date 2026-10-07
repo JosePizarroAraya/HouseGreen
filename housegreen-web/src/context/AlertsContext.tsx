@@ -1,95 +1,90 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import type { ReactNode } from "react";
-import type { AlertCriteria, AlertNotification, RiskLevel } from "../types/property";
-import { mockProperties } from "../data/mockProperties";
+import { api } from "../api/client";
+import { useAuth } from "./AuthContext";
+
+// Paso 94: las notificaciones de la persona (remates nuevos que calzan con sus alertas).
+// Antes eran datos de ejemplo guardados en el navegador; ahora vienen de la API (tabla alerts).
+// Están en un contexto porque las usan dos lugares: el número rojo del encabezado y la página Alertas.
+
+// Lo que devuelve GET /alertas por cada notificación
+export interface Notificacion {
+  id: string;
+  property_id: string | null; // null si la propiedad ya no existe
+  property_title: string | null;
+  alert_type: string;
+  message: string;
+  is_read: boolean;
+  created_at: string;
+}
 
 interface AlertsContextType {
-  criterios: AlertCriteria[];
-  notificaciones: AlertNotification[];
-  agregarCriterio: (criterio: Omit<AlertCriteria, "id">) => void;
-  eliminarCriterio: (id: string) => void;
-  marcarLeida: (id: string) => void;
+  notificaciones: Notificacion[];
   noLeidas: number;
+  cargando: boolean;
+  error: string | null;
+  recargar: () => void;
+  marcarLeida: (id: string) => void;
+  marcarTodasLeidas: () => void;
 }
 
 const AlertsContext = createContext<AlertsContextType | undefined>(undefined);
 
-const CRITERIOS_KEY = "housegreen-alert-criterios";
-const NOTIS_KEY = "housegreen-alert-notificaciones";
-
-// Orden de severidad, para poder comparar "riesgo A es igual o menor que riesgo B"
-const ORDEN_RIESGO: Record<RiskLevel, number> = { verde: 0, amarillo: 1, rojo: 2 };
-
-// Revisa si una propiedad cumple con un criterio de alerta.
-function propiedadCoincideConCriterio(
-  property: (typeof mockProperties)[number],
-  criterio: AlertCriteria
-) {
-  const coincideComuna =
-    criterio.comuna === "" || property.comuna.toLowerCase() === criterio.comuna.toLowerCase();
-
-  const coincideRiesgo =
-    criterio.riesgoMaximo === "cualquiera" ||
-    ORDEN_RIESGO[property.riesgo] <= ORDEN_RIESGO[criterio.riesgoMaximo];
-
-  const coincidePrecio = criterio.precioMaximo === null || property.precio <= criterio.precioMaximo;
-
-  return coincideComuna && coincideRiesgo && coincidePrecio;
-}
-
 export function AlertsProvider({ children }: { children: ReactNode }) {
-  const [criterios, setCriterios] = useState<AlertCriteria[]>(() => {
-    const guardado = localStorage.getItem(CRITERIOS_KEY);
-    return guardado ? JSON.parse(guardado) : [];
-  });
+  const { estaLogueado } = useAuth();
+  const [notificaciones, setNotificaciones] = useState<Notificacion[]>([]);
+  const [cargando, setCargando] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const [notificaciones, setNotificaciones] = useState<AlertNotification[]>(() => {
-    const guardado = localStorage.getItem(NOTIS_KEY);
-    return guardado ? JSON.parse(guardado) : [];
-  });
+  // useCallback guarda la función entre un dibujo y otro: así los useEffect que la usan
+  // solo se repiten cuando cambia la sesión, y no en cada dibujo.
+  const recargar = useCallback(() => {
+    if (!estaLogueado) {
+      setNotificaciones([]);
+      return;
+    }
+    setCargando(true);
+    api
+      .get("/alertas")
+      .then((datos: Notificacion[]) => {
+        setNotificaciones(datos);
+        setError(null);
+      })
+      .catch((err) => setError(err instanceof Error ? err.message : "Error desconocido"))
+      .finally(() => setCargando(false));
+  }, [estaLogueado]);
 
+  // Se piden al iniciar sesión (y se vacían al cerrarla)
   useEffect(() => {
-    localStorage.setItem(CRITERIOS_KEY, JSON.stringify(criterios));
-  }, [criterios]);
+    recargar();
+  }, [recargar]);
 
+  // Los datos de ejemplo que antes se guardaban en el navegador ya no se usan: se borran
   useEffect(() => {
-    localStorage.setItem(NOTIS_KEY, JSON.stringify(notificaciones));
-  }, [notificaciones]);
-
-  function agregarCriterio(datos: Omit<AlertCriteria, "id">) {
-    const nuevoCriterio: AlertCriteria = { ...datos, id: crypto.randomUUID() };
-    setCriterios((actuales) => [...actuales, nuevoCriterio]);
-
-    // Simulamos el "escaneo" de propiedades existentes contra este nuevo criterio,
-    // igual que haría un proceso automático en el backend cuando llega una propiedad nueva.
-    const coincidencias = mockProperties.filter((p) => propiedadCoincideConCriterio(p, nuevoCriterio));
-
-    const nuevasNotis: AlertNotification[] = coincidencias.map((p) => ({
-      id: crypto.randomUUID(),
-      propertyId: p.id,
-      criteriaId: nuevoCriterio.id,
-      fecha: new Date().toISOString(),
-      leida: false,
-    }));
-
-    setNotificaciones((actuales) => [...nuevasNotis, ...actuales]);
-  }
-
-  function eliminarCriterio(id: string) {
-    setCriterios((actuales) => actuales.filter((c) => c.id !== id));
-  }
+    localStorage.removeItem("housegreen-alert-criterios");
+    localStorage.removeItem("housegreen-alert-notificaciones");
+  }, []);
 
   function marcarLeida(id: string) {
-    setNotificaciones((actuales) =>
-      actuales.map((n) => (n.id === id ? { ...n, leida: true } : n))
-    );
+    const notificacion = notificaciones.find((n) => n.id === id);
+    if (!notificacion || notificacion.is_read) return; // ya estaba leída: no hay nada que hacer
+
+    // 1. Se marca de inmediato en la pantalla
+    setNotificaciones((actuales) => actuales.map((n) => (n.id === id ? { ...n, is_read: true } : n)));
+    // 2. Se avisa a la API. Si falla, se vuelven a pedir para mostrar lo que hay de verdad en la base.
+    api.patch(`/alertas/${id}/leida`).catch(() => recargar());
   }
 
-  const noLeidas = notificaciones.filter((n) => !n.leida).length;
+  function marcarTodasLeidas() {
+    setNotificaciones((actuales) => actuales.map((n) => ({ ...n, is_read: true })));
+    api.post("/alertas/leidas").catch(() => recargar());
+  }
+
+  const noLeidas = notificaciones.filter((n) => !n.is_read).length;
 
   return (
     <AlertsContext.Provider
-      value={{ criterios, notificaciones, agregarCriterio, eliminarCriterio, marcarLeida, noLeidas }}
+      value={{ notificaciones, noLeidas, cargando, error, recargar, marcarLeida, marcarTodasLeidas }}
     >
       {children}
     </AlertsContext.Provider>

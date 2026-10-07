@@ -1,9 +1,16 @@
 /* Formularios de entrada: iniciar sesión, código de dos pasos y crear cuenta.
-   El marco (panel verde + columna del formulario) está en components/MarcoDeEntrada.css */
+   El marco (panel verde + columna del formulario) está en components/MarcoDeEntrada.css
+   y cada campo con su ícono, en components/CampoDeEntrada.tsx */
 
+/* La tarjeta blanca del formulario */
 .login-form {
   width: 100%;
-  max-width: 380px;
+  max-width: 440px;
+  padding: 36px 36px 28px;
+  border: 1px solid #e1e7e4;
+  border-radius: 20px;
+  background-color: white;
+  box-shadow: 0 28px 56px -32px rgba(15, 61, 48, 0.45);
 }
 
 .login-form h1 {
@@ -15,7 +22,7 @@
 }
 
 .login-subtitle {
-  margin: 8px 0 28px;
+  margin: 8px 0 26px;
   color: #5f6b66;
   font-size: 16px;
   line-height: 1.45;
@@ -32,56 +39,126 @@
   line-height: 1.4;
 }
 
+/* ---------- Un campo: etiqueta, y debajo el borde con ícono + cuadro + ojo ---------- */
+.login-grupo {
+  margin-bottom: 18px;
+}
+
 .login-label {
   display: block;
-  margin-bottom: 18px;
+  margin-bottom: 6px;
   color: #2f3a35;
   font-size: 14px;
   font-weight: 600;
 }
 
-.login-input {
-  display: block;
-  width: 100%;
-  margin-top: 6px;
-  padding: 12px 14px;
+.login-campo {
+  display: flex;
+  align-items: center;
   border: 1px solid #c9d1cd;
-  border-radius: 10px;
-  box-sizing: border-box;
+  border-radius: 12px;
   background-color: white;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.login-campo:hover {
+  border-color: #9aa5a0;
+}
+
+/* focus-within: el borde verde aparece cuando el cursor está en el cuadro de adentro */
+.login-campo:focus-within {
+  border-color: #15803d;
+  box-shadow: 0 0 0 3px rgba(21, 128, 61, 0.2);
+}
+
+.login-icono {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  margin-left: 14px;
+  fill: none;
+  stroke: #7b8782;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.login-campo:focus-within .login-icono {
+  stroke: #15803d;
+}
+
+.login-input {
+  flex: 1;
+  min-width: 0;
+  padding: 13px 14px 13px 10px;
+  border: none;
+  border-radius: 12px;
+  background: none;
   color: #1c1c1c;
   font-family: inherit;
   font-size: 16px; /* con menos de 16px el iPhone acerca la pantalla al escribir */
-  font-weight: 400;
-  transition: border-color 0.15s, box-shadow 0.15s;
 }
 
 .login-input::placeholder {
   color: #9aa5a0;
 }
 
-.login-input:hover {
-  border-color: #9aa5a0;
-}
-
 .login-input:focus {
-  outline: none;
-  border-color: #15803d;
-  box-shadow: 0 0 0 3px rgba(21, 128, 61, 0.2);
+  outline: none; /* el borde verde lo dibuja .login-campo */
 }
 
+/* Botón del ojo, para ver u ocultar la contraseña */
+.login-ojo {
+  display: flex;
+  flex-shrink: 0;
+  margin-right: 6px;
+  padding: 8px;
+  border: none;
+  border-radius: 8px;
+  background: none;
+  cursor: pointer;
+}
+
+.login-ojo svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: #5f6b66;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.login-ojo:hover {
+  background-color: #f1f5f3;
+}
+
+.login-ojo[aria-pressed="true"] svg {
+  stroke: #15803d;
+}
+
+/* Texto de ayuda debajo de un campo (reglas de la contraseña en el registro) */
+.login-ayuda {
+  margin: 6px 0 0;
+  color: #5f6b66;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+/* ---------- Botón principal ---------- */
 .login-button {
   width: 100%;
-  margin-top: 6px;
-  padding: 13px;
+  margin-top: 8px;
+  padding: 14px;
   border: none;
-  border-radius: 10px;
+  border-radius: 12px;
   background-color: #15803d;
   color: white;
   font-family: inherit;
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
+  box-shadow: 0 10px 20px -12px rgba(21, 128, 61, 0.9);
   transition: background-color 0.15s;
 }
 
@@ -90,6 +167,7 @@
 }
 
 .login-button:focus-visible,
+.login-ojo:focus-visible,
 .login-volver:focus-visible,
 .login-switch a:focus-visible {
   outline: 3px solid rgba(21, 128, 61, 0.45);
@@ -98,13 +176,12 @@
 
 .login-button:disabled {
   background-color: #9aa5a0;
+  box-shadow: none;
   cursor: not-allowed;
 }
 
 .login-switch {
   margin: 22px 0 0;
-  padding-top: 20px;
-  border-top: 1px solid #e4e8e6;
   color: #5f6b66;
   font-size: 15px;
   text-align: center;
@@ -120,36 +197,34 @@
   text-decoration: underline;
 }
 
-/* Texto de ayuda debajo de un campo (reglas de la contraseña en el registro) */
-.login-ayuda {
-  display: block;
-  margin-top: 6px;
+/* Nota al pie de la tarjeta, con un escudo */
+.login-nota {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 22px 0 0;
+  padding-top: 18px;
+  border-top: 1px solid #e4e8e6;
   color: #5f6b66;
   font-size: 13px;
-  font-weight: 400;
-  line-height: 1.4;
+  line-height: 1.45;
 }
 
-/* Casilla para ver las contraseñas mientras se escriben */
-.login-mostrar {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 20px;
-  color: #2f3a35;
-  font-size: 14px;
-  cursor: pointer;
-}
-
-.login-mostrar input {
-  width: 16px;
-  height: 16px;
-  margin: 0;
-  accent-color: #15803d;
+.login-nota svg {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  margin-top: 1px;
+  fill: none;
+  stroke: #15803d;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 /* Segundo paso del inicio de sesión (código de la aplicación) */
 .login-codigo {
+  padding-left: 14px;
   font-size: 24px;
   letter-spacing: 0.2em;
   text-align: center;
@@ -168,4 +243,16 @@
 
 .login-volver:hover {
   text-decoration: underline;
+}
+
+/* Celular: la tarjeta ocupa el ancho y lleva menos espacio por dentro */
+@media (max-width: 520px) {
+  .login-form {
+    padding: 24px 20px 22px;
+    border-radius: 16px;
+  }
+
+  .login-form h1 {
+    font-size: 26px;
+  }
 }

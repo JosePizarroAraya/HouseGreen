@@ -1,118 +1,315 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
+import { api } from "../api/client";
 import { useAlerts } from "../context/AlertsContext";
-import { mockProperties } from "../data/mockProperties";
-import type { RiskLevel } from "../types/property";
+import { useProperties } from "../context/PropertiesContext";
 import { MisAnuncios } from "../components/MisAnuncios";
+import { RiskBadge } from "../components/RiskBadge";
+import { remateFinalizado, remateRetirado } from "../components/estadoRemate";
+import { fechaCorta } from "../utils/opiniones";
 import "./AlertsPage.css";
 
+// Paso 94: página Alertas conectada a la base.
+// - Izquierda: lo que llegó (anuncios del administrador y remates que calzan con las alertas).
+// - Derecha: las alertas de la persona, es decir, de qué quiere que le avisen.
+
+type Riesgo = "verde" | "amarillo" | "rojo";
+
+// Lo que devuelve la API por cada alerta (tabla saved_filters)
+interface AlertaGuardada {
+  id: string;
+  comuna_id: number | null; // null = cualquier comuna
+  comuna_name: string | null;
+  max_risk_level: Riesgo | null; // null = cualquier riesgo
+  max_price: string | null; // null = sin tope de precio
+  created_at: string;
+}
+
+const ORDEN_RIESGO: Record<Riesgo, number> = { verde: 0, amarillo: 1, rojo: 2 };
+const LARGO_MAXIMO_DEL_PRECIO = 12; // cifras
+const POR_TANDA = 10; // cuántas notificaciones se muestran de una vez
+
+function formatCLP(valor: number) {
+  return valor.toLocaleString("es-CL", { style: "currency", currency: "CLP", maximumFractionDigits: 0 });
+}
+
+// "Riesgo bajo o medio", o vacío si la alerta acepta cualquier riesgo
+function textoDelRiesgo(nivel: Riesgo | null) {
+  if (nivel === "verde") return "Solo riesgo bajo";
+  if (nivel === "amarillo") return "Riesgo bajo o medio";
+  return "";
+}
+
 export function AlertsPage() {
-  const { criterios, notificaciones, agregarCriterio, eliminarCriterio, marcarLeida } = useAlerts();
+  const { notificaciones, noLeidas, cargando, error, recargar, marcarLeida, marcarTodasLeidas } = useAlerts();
+  const { properties, comunasPorId } = useProperties();
 
-  const [comuna, setComuna] = useState("");
-  const [riesgoMaximo, setRiesgoMaximo] = useState<RiskLevel | "cualquiera">("cualquiera");
-  const [precioMaximo, setPrecioMaximo] = useState("");
+  // Las alertas solo se usan en esta página, así que se guardan aquí (null = todavía cargando)
+  const [alertas, setAlertas] = useState<AlertaGuardada[] | null>(null);
+  const [errorDeAlertas, setErrorDeAlertas] = useState("");
 
-  function handleSubmit(e: React.FormEvent) {
+  // Formulario de una alerta nueva
+  const [comunaId, setComunaId] = useState(""); // vacío = cualquier comuna
+  const [riesgo, setRiesgo] = useState(""); // vacío = cualquier riesgo
+  const [precio, setPrecio] = useState(""); // solo cifras; vacío = sin tope
+  const [guardando, setGuardando] = useState(false);
+  const [errorDelFormulario, setErrorDelFormulario] = useState("");
+
+  const [tanda, setTanda] = useState(POR_TANDA);
+
+  // Cada vez que se entra a la página se piden las notificaciones y las alertas
+  useEffect(() => {
+    recargar();
+    api
+      .get("/alertas/filtros")
+      .then((datos: AlertaGuardada[]) => setAlertas(datos))
+      .catch((err) => setErrorDeAlertas(err instanceof Error ? err.message : "Error desconocido"));
+  }, [recargar]);
+
+  // Comunas ordenadas por nombre, para la lista del formulario
+  const comunas = useMemo(
+    () =>
+      Object.entries(comunasPorId)
+        .map(([id, nombre]) => ({ id, nombre }))
+        .sort((a, b) => a.nombre.localeCompare(b.nombre, "es")),
+    [comunasPorId]
+  );
+
+  // Para encontrar rápido la propiedad de cada notificación: { id: propiedad }
+  const propiedadesPorId = useMemo(() => new Map(properties.map((p) => [p.id, p])), [properties]);
+
+  // Cuántos remates vigentes del catálogo cumplen hoy las condiciones de una alerta
+  function calzanHoy(alerta: AlertaGuardada) {
+    return properties.filter((p) => {
+      if (remateFinalizado(p.auction_date) || remateRetirado(p.status)) return false;
+      if (alerta.comuna_id !== null && p.comuna_id !== alerta.comuna_id) return false;
+      if (alerta.max_price !== null && Number(p.opening_price) > Number(alerta.max_price)) return false;
+      if (alerta.max_risk_level !== null) {
+        if (!p.evaluation) return false;
+        if (ORDEN_RIESGO[p.evaluation.result_level] > ORDEN_RIESGO[alerta.max_risk_level]) return false;
+      }
+      return true;
+    }).length;
+  }
+
+  async function crearAlerta(e: React.FormEvent) {
     e.preventDefault();
-    agregarCriterio({
-      comuna,
-      riesgoMaximo,
-      precioMaximo: precioMaximo ? Number(precioMaximo) : null,
-    });
-    // Limpiamos el formulario después de crear el criterio
-    setComuna("");
-    setRiesgoMaximo("cualquiera");
-    setPrecioMaximo("");
+    setErrorDelFormulario("");
+    if (comunaId === "" && riesgo === "" && precio === "") {
+      setErrorDelFormulario("Elige al menos una condición: comuna, riesgo o precio.");
+      return;
+    }
+    setGuardando(true);
+    try {
+      const nueva: AlertaGuardada = await api.post("/alertas/filtros", {
+        comuna_id: comunaId === "" ? null : Number(comunaId),
+        max_risk_level: riesgo === "" ? null : riesgo,
+        max_price: precio === "" ? null : Number(precio),
+      });
+      setAlertas((actuales) => [nueva, ...(actuales ?? [])]); // la nueva queda primero
+      setComunaId("");
+      setRiesgo("");
+      setPrecio("");
+    } catch (err) {
+      setErrorDelFormulario(err instanceof Error ? err.message : "No se pudo crear la alerta.");
+    } finally {
+      setGuardando(false);
+    }
   }
 
-  // Función auxiliar: busca los datos completos de la propiedad a partir del propertyId
-  // guardado en la notificación (la notificación solo guarda el id, no la propiedad completa).
-  function obtenerPropiedad(propertyId: string) {
-    return mockProperties.find((p) => p.id === propertyId);
+  async function eliminarAlerta(id: string) {
+    setErrorDeAlertas("");
+    try {
+      await api.delete(`/alertas/filtros/${id}`);
+      setAlertas((actuales) => (actuales ?? []).filter((a) => a.id !== id));
+    } catch (err) {
+      setErrorDeAlertas(err instanceof Error ? err.message : "No se pudo eliminar la alerta.");
+    }
   }
+
+  const visibles = notificaciones.slice(0, tanda);
 
   return (
     <div className="alerts-page">
       <h1>Alertas</h1>
-      <p className="alerts-subtitle">Configura criterios y te avisamos cuando aparezca algo que calce.</p>
+      <p className="alerts-subtitle">Te avisamos cuando llega un remate que te puede interesar.</p>
 
-      {/* Paso 90: los anuncios que envía el administrador */}
-      <MisAnuncios />
+      <div className="alerts-columnas">
+        {/* ---------- Lo que llegó ---------- */}
+        <div className="alerts-principal">
+          <MisAnuncios />
 
-      <form className="alerts-form" onSubmit={handleSubmit}>
-        <input
-          type="text"
-          placeholder="Comuna (vacío = cualquiera)"
-          value={comuna}
-          onChange={(e) => setComuna(e.target.value)}
-          className="alerts-input"
-        />
+          <section>
+            <div className="alerts-section-fila">
+              <h2 className="alerts-section-title">
+                Remates que calzan con tus alertas
+                {noLeidas > 0 && <span className="alerts-sin-leer">{noLeidas} sin leer</span>}
+              </h2>
+              {noLeidas > 0 && (
+                <button type="button" className="alerts-boton-texto" onClick={marcarTodasLeidas}>
+                  Marcar todas como leídas
+                </button>
+              )}
+            </div>
 
-        <select
-          value={riesgoMaximo}
-          onChange={(e) => setRiesgoMaximo(e.target.value as RiskLevel | "cualquiera")}
-          className="alerts-input"
-        >
-          <option value="cualquiera">Riesgo: cualquiera</option>
-          <option value="verde">Riesgo máximo: bajo</option>
-          <option value="amarillo">Riesgo máximo: medio</option>
-          <option value="rojo">Riesgo máximo: alto</option>
-        </select>
+            {error && <p className="alerts-error">No se pudieron cargar las notificaciones: {error}</p>}
+            {cargando && notificaciones.length === 0 && <p className="alerts-empty">Cargando...</p>}
+            {!cargando && !error && notificaciones.length === 0 && (
+              <p className="alerts-empty">
+                Todavía no hay avisos. Llegan cuando se carga un remate nuevo que cumple alguna de tus alertas.
+              </p>
+            )}
 
-        <input
-          type="number"
-          placeholder="Precio máximo (opcional)"
-          value={precioMaximo}
-          onChange={(e) => setPrecioMaximo(e.target.value)}
-          className="alerts-input"
-        />
+            <ul className="alerts-notification-list">
+              {visibles.map((n) => {
+                const propiedad = n.property_id ? propiedadesPorId.get(n.property_id) : undefined;
+                const clases = `alerts-notification-item ${n.is_read ? "" : "is-unread"}`;
 
-        <button type="submit" className="alerts-submit-btn">
-          Crear alerta
-        </button>
-      </form>
+                // La propiedad ya no existe: se muestra el aviso, pero sin enlace
+                if (!n.property_id) {
+                  return (
+                    <li key={n.id} className={clases}>
+                      <div className="alerts-notification-texto">
+                        <p className="alerts-notification-titulo">Una propiedad que ya no está disponible</p>
+                        <p className="alerts-notification-detalle">Avisado el {fechaCorta(n.created_at)}</p>
+                      </div>
+                    </li>
+                  );
+                }
 
-      <h2 className="alerts-section-title">Mis criterios</h2>
-      {criterios.length === 0 && <p className="alerts-empty">Aún no tienes criterios configurados.</p>}
+                const terminado =
+                  propiedad && (remateRetirado(propiedad.status) || remateFinalizado(propiedad.auction_date));
 
-      <ul className="alerts-criteria-list">
-        {criterios.map((c) => (
-          <li key={c.id} className="alerts-criteria-item">
-            <span>
-              {c.comuna || "Cualquier comuna"} · Riesgo máx: {c.riesgoMaximo} ·{" "}
-              {c.precioMaximo ? `Hasta $${c.precioMaximo.toLocaleString("es-CL")}` : "Sin tope de precio"}
-            </span>
-            <button onClick={() => eliminarCriterio(c.id)} className="alerts-delete-btn">
-              Eliminar
-            </button>
-          </li>
-        ))}
-      </ul>
+                return (
+                  <li key={n.id}>
+                    <Link to={`/propiedades/${n.property_id}`} className={clases} onClick={() => marcarLeida(n.id)}>
+                      <div className="alerts-notification-texto">
+                        <p className="alerts-notification-titulo">
+                          {!n.is_read && <span className="alerts-nuevo">Nuevo</span>}
+                          {n.property_title ?? "Propiedad"}
+                        </p>
+                        <p className="alerts-notification-detalle">
+                          {propiedad && `${comunasPorId[propiedad.comuna_id] ?? "Comuna desconocida"} · `}
+                          {propiedad && `${formatCLP(Number(propiedad.opening_price))} · `}
+                          Avisado el {fechaCorta(n.created_at)}
+                        </p>
+                      </div>
+                      {terminado ? (
+                        <span className="alerts-terminado">
+                          {remateRetirado(propiedad.status) ? "Remate retirado" : "Remate finalizado"}
+                        </span>
+                      ) : (
+                        propiedad?.evaluation && <RiskBadge riesgo={propiedad.evaluation.result_level} />
+                      )}
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
 
-      <h2 className="alerts-section-title">Notificaciones</h2>
-      {notificaciones.length === 0 && <p className="alerts-empty">No tienes notificaciones todavía.</p>}
+            {notificaciones.length > visibles.length && (
+              <button type="button" className="alerts-mas" onClick={() => setTanda(tanda + POR_TANDA)}>
+                Mostrar más ({notificaciones.length - visibles.length})
+              </button>
+            )}
+          </section>
+        </div>
 
-      <ul className="alerts-notification-list">
-        {notificaciones.map((n) => {
-          const propiedad = obtenerPropiedad(n.propertyId);
-          if (!propiedad) return null;
+        {/* ---------- De qué quiere que le avisen ---------- */}
+        <aside className="alerts-lateral">
+          <h2 className="alerts-section-title">Mis alertas</h2>
+          <p className="alerts-ayuda">
+            Elige una o más condiciones. Te avisaremos cuando llegue un remate nuevo que las cumpla todas.
+          </p>
 
-          return (
-            <Link
-              key={n.id}
-              to={`/propiedades/${propiedad.id}`}
-              onClick={() => marcarLeida(n.id)}
-              className={`alerts-notification-item ${n.leida ? "" : "is-unread"}`}
-            >
-              <span>
-                Nueva propiedad que calza: <strong>{propiedad.titulo}</strong> ({propiedad.comuna})
+          <form className="alerts-form" onSubmit={crearAlerta} noValidate>
+            <label className="alerts-campo">
+              Comuna
+              <select value={comunaId} onChange={(e) => setComunaId(e.target.value)}>
+                <option value="">Cualquier comuna</option>
+                {comunas.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.nombre}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <label className="alerts-campo">
+              Riesgo
+              <select value={riesgo} onChange={(e) => setRiesgo(e.target.value)}>
+                <option value="">Cualquier riesgo</option>
+                <option value="verde">Solo riesgo bajo</option>
+                <option value="amarillo">Riesgo bajo o medio</option>
+              </select>
+            </label>
+
+            <label className="alerts-campo">
+              Precio mínimo del remate, hasta
+              <span className="alerts-precio">
+                <span aria-hidden="true">$</span>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  placeholder="Sin tope"
+                  // Se guardan solo las cifras y se muestran con puntos: 60000000 -> 60.000.000
+                  value={precio === "" ? "" : Number(precio).toLocaleString("es-CL")}
+                  onChange={(e) => setPrecio(e.target.value.replace(/\D/g, "").slice(0, LARGO_MAXIMO_DEL_PRECIO))}
+                />
               </span>
-              {!n.leida && <span className="alerts-unread-dot" />}
-            </Link>
-          );
-        })}
-      </ul>
+            </label>
+
+            {errorDelFormulario && (
+              <p className="alerts-error-chico" role="alert">
+                {errorDelFormulario}
+              </p>
+            )}
+
+            <button type="submit" className="alerts-submit-btn" disabled={guardando}>
+              {guardando ? "Creando..." : "Crear alerta"}
+            </button>
+          </form>
+
+          {errorDeAlertas && <p className="alerts-error">No se pudo completar: {errorDeAlertas}</p>}
+          {alertas === null && !errorDeAlertas && <p className="alerts-empty">Cargando...</p>}
+          {alertas !== null && alertas.length === 0 && (
+            <p className="alerts-empty">Todavía no tienes alertas. Crea la primera con el formulario.</p>
+          )}
+
+          <ul className="alerts-criteria-list">
+            {(alertas ?? []).map((alerta) => {
+              const cuantos = calzanHoy(alerta);
+              return (
+                <li key={alerta.id} className="alerts-criteria-item">
+                  <div className="alerts-criteria-texto">
+                    <p className="alerts-criteria-comuna">
+                      {alerta.comuna_id === null ? "Cualquier comuna" : (alerta.comuna_name ?? "Comuna desconocida")}
+                    </p>
+                    <p className="alerts-criteria-condiciones">
+                      {[
+                        textoDelRiesgo(alerta.max_risk_level),
+                        alerta.max_price !== null ? `Hasta ${formatCLP(Number(alerta.max_price))}` : "",
+                      ]
+                        .filter((texto) => texto !== "")
+                        .join(" · ") || "Cualquier riesgo y precio"}
+                    </p>
+                    <p className="alerts-criteria-hoy">
+                      {cuantos === 0
+                        ? "Hoy ningún remate vigente la cumple"
+                        : cuantos === 1
+                          ? "Hoy la cumple 1 remate vigente"
+                          : `Hoy la cumplen ${cuantos.toLocaleString("es-CL")} remates vigentes`}
+                    </p>
+                  </div>
+                  <button type="button" className="alerts-delete-btn" onClick={() => eliminarAlerta(alerta.id)}>
+                    Eliminar
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        </aside>
+      </div>
     </div>
   );
 }

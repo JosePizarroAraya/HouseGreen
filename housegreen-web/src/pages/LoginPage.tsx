@@ -2,12 +2,13 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { MarcoDeEntrada } from "../components/MarcoDeEntrada";
+import { CampoDeEntrada } from "../components/CampoDeEntrada";
 import "./LoginPage.css";
 
 export function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [mostrar, setMostrar] = useState(false); // ver la contraseña mientras se escribe
+  const [mostrar, setMostrar] = useState(false); // el ojo: ver la contraseña mientras se escribe
   const [error, setError] = useState("");
 
   // Paso 78: segundo paso del inicio de sesión (solo para cuentas con verificación en dos pasos)
@@ -69,21 +70,26 @@ export function LoginPage() {
             </p>
           )}
 
-          <label className="login-label">
-            Código
-            <input
-              type="text"
-              inputMode="numeric"
-              autoComplete="one-time-code"
-              autoFocus
-              maxLength={7}
-              value={codigo}
-              // Solo números y espacio (la aplicación lo muestra como "123 456")
-              onChange={(e) => setCodigo(e.target.value.replace(/[^\d ]/g, ""))}
-              className="login-input login-codigo"
-              placeholder="123 456"
-            />
-          </label>
+          <div className="login-grupo">
+            <label className="login-label" htmlFor="codigo-de-dos-pasos">
+              Código
+            </label>
+            <div className="login-campo">
+              <input
+                id="codigo-de-dos-pasos"
+                type="text"
+                inputMode="numeric"
+                autoComplete="one-time-code"
+                autoFocus
+                maxLength={7}
+                value={codigo}
+                // Solo números y espacio (la aplicación lo muestra como "123 456")
+                onChange={(e) => setCodigo(e.target.value.replace(/[^\d ]/g, ""))}
+                className="login-input login-codigo"
+                placeholder="123 456"
+              />
+            </div>
+          </div>
 
           <button type="submit" className="login-button" disabled={cargando}>
             {cargando ? "Verificando..." : "Verificar"}
@@ -111,34 +117,27 @@ export function LoginPage() {
           </p>
         )}
 
-        <label className="login-label">
-          Correo electrónico
-          <input
-            type="email"
-            autoComplete="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="login-input"
-            placeholder="tucorreo@ejemplo.com"
-          />
-        </label>
+        <CampoDeEntrada
+          etiqueta="Correo electrónico"
+          icono="correo"
+          type="email"
+          autoComplete="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="tucorreo@ejemplo.com"
+        />
 
-        <label className="login-label">
-          Contraseña
-          <input
-            type={mostrar ? "text" : "password"}
-            autoComplete="current-password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="login-input"
-            placeholder="••••••••"
-          />
-        </label>
-
-        <label className="login-mostrar">
-          <input type="checkbox" checked={mostrar} onChange={(e) => setMostrar(e.target.checked)} />
-          Mostrar la contraseña
-        </label>
+        <CampoDeEntrada
+          etiqueta="Contraseña"
+          icono="candado"
+          type={mostrar ? "text" : "password"}
+          autoComplete="current-password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          placeholder="••••••••"
+          visible={mostrar}
+          alCambiarVisible={() => setMostrar(!mostrar)}
+        />
 
         <button type="submit" className="login-button" disabled={cargando}>
           {cargando ? "Ingresando..." : "Ingresar"}
@@ -146,6 +145,14 @@ export function LoginPage() {
 
         <p className="login-switch">
           ¿No tienes cuenta? <Link to="/registro">Regístrate</Link>
+        </p>
+
+        <p className="login-nota">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 3 5 6v5.5c0 4.2 2.9 7.6 7 9 4.1-1.4 7-4.8 7-9V6l-7-3Z" />
+            <path d="m9 12 2.2 2.2L15 10.5" />
+          </svg>
+          Puedes proteger tu cuenta con verificación en dos pasos desde tu Perfil.
         </p>
       </form>
     </MarcoDeEntrada>

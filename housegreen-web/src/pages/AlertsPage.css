@@ -1,105 +1,387 @@
+/* Paso 94: página Alertas. Dos columnas en computador (lo que llegó + mis alertas), una en celular. */
+
 .alerts-page {
-  max-width: 640px;
+  max-width: 1040px;
   margin: 0 auto;
-  padding: 32px 16px;
+  padding: 32px 20px 48px;
+}
+
+.alerts-page h1 {
+  margin: 0;
+  color: #0f3d30;
+  font-size: 30px;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
 }
 
 .alerts-subtitle {
-  color: #737373;
-  margin-top: 4px;
+  margin: 6px 0 0;
+  color: #5f6b66;
+  font-size: 16px;
 }
 
-.alerts-form {
+.alerts-columnas {
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+  align-items: start;
+  gap: 32px;
+  margin-top: 28px;
+}
+
+.alerts-principal {
   display: flex;
-  gap: 10px;
-  margin-top: 24px;
-  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 32px;
 }
 
-.alerts-input {
-  flex: 1;
-  min-width: 140px;
-  padding: 9px 12px;
-  border: 1px solid #d4d4d4;
-  border-radius: 8px;
+/* Títulos de sección (también los usa el componente MisAnuncios) */
+.alerts-section-title {
+  margin: 0;
+  color: #0f3d30;
+  font-size: 18px;
+}
+
+.alerts-section-fila {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+}
+
+.alerts-sin-leer {
+  margin-left: 8px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background-color: #dc2626;
+  color: white;
+  font-size: 12px;
+  font-weight: 700;
+  vertical-align: middle;
+}
+
+.alerts-empty {
+  margin: 12px 0 0;
+  color: #5f6b66;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.alerts-error {
+  margin: 12px 0 0;
+  padding: 10px 14px;
+  border-left: 4px solid #dc2626;
+  border-radius: 6px;
+  background-color: #fef2f2;
+  color: #991b1b;
   font-size: 14px;
 }
 
-.alerts-submit-btn {
-  padding: 9px 16px;
+.alerts-error-chico {
+  margin: 0;
+  color: #991b1b;
+  font-size: 14px;
+}
+
+/* ---------- Notificaciones ---------- */
+.alerts-notification-list,
+.alerts-criteria-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.alerts-notification-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid #e4e8e6;
+  border-radius: 12px;
+  background-color: white;
+  color: inherit;
+  text-decoration: none;
+}
+
+a.alerts-notification-item:hover {
+  border-color: #9ad3bb;
+}
+
+.alerts-notification-item.is-unread {
+  border-color: #86efac;
+  background-color: #f0fdf4;
+}
+
+.alerts-notification-texto {
+  min-width: 0;
+}
+
+.alerts-notification-titulo {
+  margin: 0;
+  color: #1c1c1c;
+  font-size: 15px;
+  overflow-wrap: anywhere;
+}
+
+.alerts-notification-item.is-unread .alerts-notification-titulo {
+  font-weight: 700;
+}
+
+.alerts-notification-detalle {
+  margin: 2px 0 0;
+  color: #5f6b66;
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+.alerts-nuevo {
+  margin-right: 8px;
+  padding: 2px 8px;
+  border-radius: 999px;
   background-color: #15803d;
   color: white;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+/* La insignia de riesgo y la etiqueta de remate terminado no se achican ni se parten */
+.alerts-notification-item .risk-badge,
+.alerts-terminado {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.alerts-terminado {
+  padding: 4px 10px;
+  border-radius: 999px;
+  background-color: #eef1f0;
+  color: #5f6b66;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.alerts-boton-texto {
+  padding: 0;
   border: none;
-  border-radius: 8px;
+  background: none;
+  color: #15803d;
+  font-family: inherit;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
 }
 
-.alerts-section-title {
-  margin-top: 32px;
+.alerts-boton-texto:hover {
+  text-decoration: underline;
+}
+
+.alerts-mas {
+  margin-top: 10px;
+  padding: 8px 14px;
+  border: 1px solid #c9d1cd;
+  border-radius: 8px;
+  background-color: white;
+  color: #2f3a35;
+  font-family: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+/* ---------- Mis alertas (columna de la derecha) ---------- */
+.alerts-lateral {
+  padding: 20px;
+  border: 1px solid #e4e8e6;
+  border-radius: 16px;
+  background-color: white;
+}
+
+.alerts-ayuda {
+  margin: 6px 0 0;
+  color: #5f6b66;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.alerts-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 16px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #e4e8e6;
+}
+
+.alerts-campo {
+  display: block;
+  color: #2f3a35;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.alerts-campo select,
+.alerts-precio {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  margin-top: 6px;
+  border: 1px solid #c9d1cd;
+  border-radius: 10px;
+  background-color: white;
+  color: #1c1c1c;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 400;
+}
+
+.alerts-campo select {
+  padding: 11px 12px;
+}
+
+/* El campo del precio: un "$" fijo y el número al lado, dentro de un mismo borde */
+.alerts-precio {
+  gap: 6px;
+  padding: 0 12px;
+  color: #5f6b66;
+}
+
+.alerts-precio input {
+  flex: 1;
+  min-width: 0;
+  padding: 11px 0;
+  border: none;
+  background: none;
+  color: #1c1c1c;
+  font-family: inherit;
   font-size: 16px;
 }
 
-.alerts-empty {
-  color: #a3a3a3;
-  font-size: 14px;
+.alerts-precio input:focus {
+  outline: none;
 }
 
-.alerts-criteria-list,
-.alerts-notification-list {
-  list-style: none;
-  padding: 0;
-  margin-top: 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+.alerts-campo select:focus,
+.alerts-precio:focus-within {
+  outline: none;
+  border-color: #15803d;
+  box-shadow: 0 0 0 3px rgba(21, 128, 61, 0.2);
+}
+
+.alerts-submit-btn {
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  background-color: #15803d;
+  color: white;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.alerts-submit-btn:hover {
+  background-color: #0f3d30;
+}
+
+.alerts-submit-btn:disabled {
+  background-color: #9aa5a0;
+  cursor: not-allowed;
+}
+
+.alerts-submit-btn:focus-visible,
+.alerts-delete-btn:focus-visible,
+.alerts-boton-texto:focus-visible,
+.alerts-mas:focus-visible,
+a.alerts-notification-item:focus-visible {
+  outline: 3px solid rgba(21, 128, 61, 0.45);
+  outline-offset: 2px;
+}
+
+.alerts-criteria-list {
+  margin-top: 16px;
 }
 
 .alerts-criteria-item {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  padding: 10px 14px;
-  background-color: white;
-  border: 1px solid #e5e5e4;
-  border-radius: 8px;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background-color: #f4f7f5;
+}
+
+.alerts-criteria-texto {
+  min-width: 0;
+}
+
+.alerts-criteria-item p {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.alerts-criteria-comuna {
+  color: #0f3d30;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.alerts-criteria-condiciones {
+  color: #2f3a35;
+  font-size: 14px;
+}
+
+.alerts-criteria-item .alerts-criteria-hoy {
+  margin-top: 4px;
+  color: #5f6b66;
   font-size: 13px;
 }
 
 .alerts-delete-btn {
-  background: none;
-  border: none;
-  color: #dc2626;
-  font-size: 13px;
-  cursor: pointer;
-}
-
-.alerts-notification-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px 14px;
-  background-color: white;
-  border: 1px solid #e5e5e4;
-  border-radius: 8px;
-  font-size: 13px;
-  cursor: pointer;
-}
-
-.alerts-notification-item.is-unread {
-  background-color: #f0fdf4;
-  border-color: #86efac;
-}
-
-.alerts-unread-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background-color: #15803d;
   flex-shrink: 0;
+  padding: 2px 0;
+  border: none;
+  background: none;
+  color: #b91c1c;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
 }
-.alerts-notification-item {
-  text-decoration: none;
-  color: inherit;
+
+.alerts-delete-btn:hover {
+  text-decoration: underline;
+}
+
+/* ---------- Tablet y celular: una sola columna ---------- */
+@media (max-width: 860px) {
+  .alerts-page {
+    padding: 24px 16px 40px;
+  }
+
+  .alerts-page h1 {
+    font-size: 26px;
+  }
+
+  .alerts-columnas {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 28px;
+    margin-top: 24px;
+  }
+
+  .alerts-lateral {
+    padding: 16px;
+  }
+}
+
+/* Celular angosto: la insignia pasa debajo del texto de la notificación */
+@media (max-width: 480px) {
+  .alerts-notification-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
 }
