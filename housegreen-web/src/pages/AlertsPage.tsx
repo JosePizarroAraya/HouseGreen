@@ -189,6 +189,8 @@ export function AlertsPage() {
                           {n.property_title ?? "Propiedad"}
                         </p>
                         <p className="alerts-notification-detalle">
+                          {/* Paso 98: avisos por mejora de nivel (los demás son de remates nuevos) */}
+                          {n.alert_type === "cambio_semaforo" && "Bajó su nivel de riesgo · "}
                           {propiedad && `${comunasPorId[propiedad.comuna_id] ?? "Comuna desconocida"} · `}
                           {propiedad && `${formatCLP(Number(propiedad.opening_price))} · `}
                           Avisado el {fechaCorta(n.created_at)}

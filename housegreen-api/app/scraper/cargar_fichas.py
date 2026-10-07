@@ -9,11 +9,11 @@
 import sys
 
 import requests
-from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
 
 from app.database import SessionLocal
 from app.models.property import Property, PropertyAuctionInfo, PropertyLegalInfo
+from app.routers.alerts import recalcular_semaforo_y_avisar
 from app.scraper.cargar_remates import FUENTE
 from app.scraper.ficha_remate import leer_ficha
 
@@ -57,9 +57,9 @@ def guardar_ficha(db, propiedad: Property, ficha: dict) -> None:
 
     db.commit()
 
-    # 4) Paso 71: como cambió el dominio, se recalcula el semáforo de esta propiedad
-    db.execute(text("SELECT calculate_score(:pid)"), {"pid": str(propiedad.id)})
-    db.commit()
+    # 4) Paso 71: como cambió el dominio, se recalcula el semáforo de esta propiedad.
+    #    Paso 98: si con eso mejora de nivel, se avisa a quienes tienen una alerta que ahora cumple.
+    recalcular_semaforo_y_avisar(db, propiedad)
 
 
 def cargar_fichas(maximo: int | None = None) -> dict:

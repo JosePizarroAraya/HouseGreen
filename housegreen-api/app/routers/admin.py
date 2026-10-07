@@ -357,9 +357,12 @@ def definir_semaforo(
 
     db.commit()
 
-    # Se recalcula con la función de la base (la misma que usa el resto de la API)
-    db.execute(text("SELECT calculate_score(:pid)"), {"pid": str(property_id)})
-    db.commit()
+    # Se recalcula con la función de la base (la misma que usa el resto de la API).
+    # Paso 98: si con esto la propiedad mejora de nivel, se avisa a quienes tienen una alerta que ahora cumple.
+    # (Se importa aquí adentro, y no arriba del archivo, para que el cambio quede en un solo lugar.)
+    from app.routers.alerts import recalcular_semaforo_y_avisar
+
+    recalcular_semaforo_y_avisar(db, propiedad)
 
     evaluacion = (
         db.query(PropertyEvaluation)

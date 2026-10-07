@@ -1,15 +1,18 @@
+from datetime import datetime, timezone
 from decimal import Decimal
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.models.alert import SavedFilter, Alert
-from app.models.property import Comuna, Property
+from app.models.property import Comuna, Property, PropertyEvaluation
 from app.models.user import User
 from app.schemas.alert import SavedFilterCreate, SavedFilterOut, AlertOut
 from app.auth.dependencies import get_current_user
+from app.routers.admin_panel import _esta_vigente  # la misma regla de "remate vigente" del Panel
 
 router = APIRouter(tags=["Alertas"])
 
@@ -18,6 +21,7 @@ ORDEN_RIESGO = {"verde": 0, "amarillo": 1, "rojo": 2}
 
 MAXIMO_DE_ALERTAS = 10  # por persona
 PRECIO_TOPE = Decimal("1000000000000")  # la columna de la base guarda hasta 12 cifras
+NOMBRE_DEL_NIVEL = {"verde": "riesgo bajo", "amarillo": "riesgo medio", "rojo": "riesgo alto"}
 
 
 def notificar_nueva_propiedad(db: Session, propiedad: Property, nivel_riesgo: str):
@@ -49,6 +53,77 @@ def notificar_nueva_propiedad(db: Session, propiedad: Property, nivel_riesgo: st
             avisados.add(filtro.user_id)
 
     db.commit()
+
+
+# ---------- Paso 98: avisar cuando una propiedad MEJORA de nivel ----------
+# Un remate casi nunca llega en verde: sube de nivel después, cuando se lee su ficha
+# o cuando el administrador le pone la zona de precio. Sin esto, una alerta de
+# "Solo riesgo bajo" no avisaría nunca.
+
+def notificar_cambio_de_semaforo(
+    db: Session, propiedad: Property, nivel_anterior: str | None, nivel_nuevo: str | None
+) -> int:
+    """Avisa a quienes tienen una alerta que la propiedad NO cumplía por su riesgo y ahora sí cumple.
+    Devuelve a cuántas personas se les avisó."""
+    if nivel_anterior is None or nivel_nuevo is None:
+        return 0
+    if ORDEN_RIESGO[nivel_nuevo] >= ORDEN_RIESGO[nivel_anterior]:
+        return 0  # quedó igual o empeoró: no se avisa
+    if not _esta_vigente(propiedad.status, propiedad.auction_date, datetime.now(timezone.utc)):
+        return 0  # el remate ya pasó o fue retirado: no tiene sentido avisar
+
+    # Solo interesan las alertas que piden un riesgo máximo
+    filtros = db.query(SavedFilter).filter(SavedFilter.max_risk_level.isnot(None)).all()
+    avisados = set()  # cada persona recibe UN aviso, aunque calce con varias de sus alertas
+
+    for filtro in filtros:
+        if filtro.user_id in avisados:
+            continue
+        tope = ORDEN_RIESGO[filtro.max_risk_level]
+        antes_no_calzaba = ORDEN_RIESGO[nivel_anterior] > tope
+        ahora_calza = ORDEN_RIESGO[nivel_nuevo] <= tope
+        coincide_comuna = filtro.comuna_id is None or filtro.comuna_id == propiedad.comuna_id
+        coincide_precio = filtro.max_price is None or propiedad.opening_price <= filtro.max_price
+
+        if antes_no_calzaba and ahora_calza and coincide_comuna and coincide_precio:
+            mensaje = f"Bajó a {NOMBRE_DEL_NIVEL[nivel_nuevo]} una propiedad que calza con tus alertas: {propiedad.title}"
+            db.add(
+                Alert(
+                    user_id=filtro.user_id,
+                    property_id=propiedad.id,
+                    alert_type="cambio_semaforo",
+                    message=mensaje[:255],  # la columna guarda hasta 255 caracteres
+                )
+            )
+            avisados.add(filtro.user_id)
+
+    db.commit()
+    return len(avisados)
+
+
+def _nivel_actual(db: Session, property_id) -> str | None:
+    # El nivel de la evaluación más reciente de la propiedad (None si nunca se evaluó)
+    return (
+        db.query(PropertyEvaluation.result_level)
+        .filter(PropertyEvaluation.property_id == property_id)
+        .order_by(PropertyEvaluation.evaluated_at.desc())
+        .limit(1)
+        .scalar()
+    )
+
+
+def _recalcular(db: Session, property_id) -> None:
+    # La función de la base que calcula el semáforo (la misma que usa el resto de la API)
+    db.execute(text("SELECT calculate_score(:pid)"), {"pid": str(property_id)})
+    db.commit()
+
+
+def recalcular_semaforo_y_avisar(db: Session, propiedad: Property) -> None:
+    """Recalcula el semáforo de una propiedad y, si mejoró de nivel, avisa a quienes corresponde.
+    La usan el administrador (al fijar la zona de precio o el dominio) y el cargador de fichas."""
+    antes = _nivel_actual(db, propiedad.id)
+    _recalcular(db, propiedad.id)
+    notificar_cambio_de_semaforo(db, propiedad, antes, _nivel_actual(db, propiedad.id))
 
 
 # ---------- Alertas (lo que la persona pide que le avisen) ----------
